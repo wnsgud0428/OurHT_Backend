@@ -68,7 +68,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR.parent, 'frontend', 'build')],
+        'DIRS': [os.path.join(BASE_DIR.parent, 'OurHT_Frontend', 'build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +82,7 @@ TEMPLATES = [
 ]
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'frontend', 'build', 'static'),
+    os.path.join(BASE_DIR.parent, 'OurHT_Frontend', 'build', 'static'),
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -141,3 +141,10 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MEDIA 관련 설정
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
+
+MEDIA_URL = "/media/"
+# 실제 MEDIA 파일의 웹 상 URL 설정
+# 앞에있는 /은 절대경로로 만들어줌, 반드시 / 로 끝나야함!
