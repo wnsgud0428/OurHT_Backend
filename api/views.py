@@ -1,7 +1,8 @@
-from .models import Image, User
+from .models import User, Image
 from .serializer import UserSerializer, ImageSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -18,6 +19,7 @@ def getRoutes(request):
 
 
 @api_view(['GET', 'POST'])
+@csrf_exempt
 def getUsers(request):
     # 'api/users'으로 온 GET 요청 처리 -> 유저들 목록 반환
     if request.method == 'GET':
@@ -43,11 +45,11 @@ def getImages(request):
         users = Image.objects.all().order_by()
         serializer = ImageSerializer(users, many=True)
     
-    #
+    # Image 객체 생성
     if request.method == 'POST':
         print("Images POST")
         data = request.data
-        image = Image.objects.create(image_data = data)
+        image = Image.objects.create(image_url = data)
         serializer = ImageSerializer(image, many=False)
     
     return Response(serializer.data)

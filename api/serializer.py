@@ -1,5 +1,7 @@
+from django.db import models
+from django.db.models import fields
 from rest_framework.serializers import ModelSerializer
-from .models import User, Image
+from .models import Image, User
 
 class UserSerializer(ModelSerializer):
     class Meta:

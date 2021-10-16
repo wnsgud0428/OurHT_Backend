@@ -4,10 +4,16 @@ from django.db.models.base import Model
 # Create your models here.
 class User(models.Model):
     name = models.CharField(max_length=10)
-    age = models.IntegerField()
-    weight = models.IntegerField()
-    gender = models.CharField()
+    '''
+    age = models.IntegerField(default=0)
+    weight = models.IntegerField(default=0)
+    gender = models.CharField(default="Not Selected", max_length=10)
+    '''
 
+class Image(models.Model):
+    image_url = models.ImageField(upload_to="images")
+
+"""
 class Image(models.Model):
     user = models.ForeignKey("User", related_name="Image", on_delete=models.CASCADE)
     name = models.CharField(max_length=10)
@@ -18,3 +24,4 @@ class Calendar(models.Model):
 
 class Sport(models.Model):
     pass
+"""
