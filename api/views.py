@@ -47,24 +47,16 @@ def getImages(request):
         users = Image.objects.all().order_by()
         serializer = ImageSerializer(users, many=True)
     
-    # Image 객체 생성
+    # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
     if request.method == 'POST':
         print("Images POST")
         data = request.data
 
-        # base64를 이미지로 바꿔야함!!
-        data = data.encode()
-        imgdata = base64.b64encode(data)
+        # base64를 이미지로 바꾸는 과정
+        imgdata = base64.b64decode(data)
         with open('test.jpeg', 'wb') as f:
             f.write(imgdata)
-        '''
-        binary_data = a2b_base64(data)
-        fd = open('test.jpeg', 'wb')
-        fd.write(binary_data)
-        fd.close()
-        
-        print("dd")
+        # 이미지 모델 저장은 조금 더 고민..
         image = Image.objects.create(image_url = binary_data)
         serializer = ImageSerializer(image, many=False)
-        '''
     # return Response(serializer.data)
