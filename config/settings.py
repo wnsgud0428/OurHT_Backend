@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Our apps
+    'apis.apps.ApisConfig',
+
     # For rest Framework
     'rest_framework',
     'corsheaders',
@@ -138,3 +141,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 기본 User Model
+AUTH_USER_MODEL = 'apis.User'
