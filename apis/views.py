@@ -5,7 +5,7 @@ from rest_framework.response import Response
 # Create your views here.
 
 @api_view(['GET'])
-# 주석 달기
+# 주석 달기, body 부분 수정
 def getRoutes(request):
 
     routes = [
@@ -16,12 +16,21 @@ def getRoutes(request):
             'description': 'Returns an array of users'
         },
         {
-            'Endpoint'
+            'Endpoint': '/users/',
+            'method': 'POST',
+            'body': None,
+            'description': 'Create User'
         }
     ]
     return Response(routes)
 
 @api_view(['GET', 'POST'])
-# 함수 이름 조금 더 고민
-def getUsers(request):
-    pass
+# 'api/users/login' - 유저 로그인 기능 처리 함수
+def login(request):
+    # GET 요청 처리 -> 
+    if request.method == 'GET':
+        data = request.data
+
+    # POST 요청 처리
+    if request.method == 'POST':
+        pass
