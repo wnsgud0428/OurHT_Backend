@@ -1,31 +1,38 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from .serializer import UserSerializer
 from .models import User
 # Create your views here.
 
 @api_view(['GET'])
-# 주석 달기, body 부분 수정
+# 주석 달기
 def getRoutes(request):
 
     routes = [
         {
-            'Endpoint': '/users/',
-            'method': 'GET',
-            'body': None,
-            'description': 'Returns an array of users'
+            # 'api/users/login'
+            'Endpoint': 'api/users/login',
+            'method': 'GET', 'POST'
+            'body': {"userid", "userpassword"},
+            'description': '로그인 성공 여부 판단'
         },
         {
-            'Endpoint': '/users/',
-            'method': 'POST',
-            'body': None,
-            'description': 'Create User'
+            # 'api/users/getuserinfo'
+            'Endpoint': 'api/users/getuserinfo',
+            'method': 'GET',
+            'body': {'username'},
+            'description': '유저 이름을 받아, 유저 정보 웹으로 전달'
+        },
+        {
+            # API 만들때마다 추가
         }
     ]
     return Response(routes)
 
-@api_view(['GET', 'POST'])
 # 'api/users/login' - 유저 로그인 기능 처리 함수
+@api_view(['GET', 'POST'])
 def login(request):
     # GET 요청 처리 -> 
     if request.method == 'GET':
@@ -54,3 +61,17 @@ def login(request):
     
     # Response 응답 고민!
     return Response("응답을 뭘 줄껀지도 고민")
+
+# 'api/users/getuserinfo' - 유저 정보를 웹에 전달해주는 함수
+@api_view(['GET'])
+def getuserinfo(request):
+
+    username = request.GET.get("username")
+    user = User.objects.filter(username=username)
+
+    if not user:
+        # 유저 존재안함! 요청 오류
+        pass
+    else:
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data)

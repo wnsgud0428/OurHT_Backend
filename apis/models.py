@@ -14,10 +14,11 @@ class User(models.Model):
 
 # 운동 피드백 모델 정의
 class Feedback(models.Model):
-    user = models.ForeignKey("User", related_name="feedbacks", on_delete=models.CASCADE)
-    # categori
+    user = models.ForeignKey("User", related_name="feedbacks", on_delete=models.CASCADE, default=False)
+    categori = models.CharField(max_length=10, default="")
     # day?
-    pass
+    count = models.IntegerField(default="0")
+    score = models.IntegerField(default="0", validators=[MinValueValidator(0), MaxValueValidator(100)])
 
 # 운동 사진 정의
 class Photo(models.Model):
