@@ -8,6 +8,7 @@ djangorestframework = "==3.12.4"
 django-cors-headers = "==3.10.0"
 Django = "==3.2.8"
 Pillow = "==8.4.0"
+numpy = "*"
 
 [dev-packages]
 

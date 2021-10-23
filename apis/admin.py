@@ -13,8 +13,7 @@ class UserAdmin(admin.ModelAdmin):
         "weight",
         "gender",
     )
-
-    # list_display = [field.name for field in User._meta.get_fields()]
+    
 
 @admin.register(models.Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
