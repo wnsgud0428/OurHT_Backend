@@ -54,7 +54,7 @@ def getImages(request):
 
         # base64를 이미지로 바꾸는 과정
         imgdata = base64.b64decode(data)
-        with open('test.jpeg', 'wb') as f:
+        with open('media/squat.jpeg', 'wb') as f:
             f.write(imgdata)
         # 이미지 모델 저장은 조금 더 고민..
         image = Image.objects.create(image_url = binary_data)
