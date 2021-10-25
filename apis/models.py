@@ -23,7 +23,7 @@ class Feedback(models.Model):
 # 운동 사진 정의
 class Photo(models.Model):
     caption = models.CharField(max_length=80)
-    # 저장경로 네이밍 고민
-    file = models.ImageField(upload_to="")
+    # /photos 폴더에 저장
+    file = models.ImageField(upload_to="photos")
     feedback = models.ForeignKey("Feedback", related_name="photos", on_delete=models.CASCADE)
     pass
