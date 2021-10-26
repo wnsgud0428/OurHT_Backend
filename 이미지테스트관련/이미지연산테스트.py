@@ -74,10 +74,13 @@ def find_boarderlinepoint(picture, slope, start_x, start_y, end_x):
 
 testimage = cv2.imread("testimage.png", cv2.IMREAD_COLOR)
 testpic = np.array(testimage)
+print(testpic)
 cv2.imshow("Hello", testimage)
 cv2.waitKey()
 
 test_slope = find_straightslope(0, 0, 2, 2)
-print("기울기 :", test_slope)
+print("기울기 : ", test_slope)
 test_arr = find_boarderlinepoint(testpic, test_slope, 1, 1, 10)
 print("거리 : ", test_arr)
+
+# 이미지 배열, 관절의 좌표 
