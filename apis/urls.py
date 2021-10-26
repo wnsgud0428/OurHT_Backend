@@ -8,6 +8,7 @@ urlpatterns = [
     path('users/login', views.login, name="login"),
     path('users/getuserinfo', views.getuserinfo, name='getuserinfo'),
     
-    # 
+    # Image 관련 API
+    path('images/getjointpoint', views.getjointpoint, name='getjointpoint'),
     #path('images/', views.getImages, name="getImages"),
 ]

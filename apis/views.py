@@ -26,6 +26,9 @@ def getRoutes(request):
             'description': '유저 이름을 받아, 유저 정보 웹으로 전달'
         },
         {
+            # 'api/images
+        },
+        {
             # API 만들때마다 추가
         }
     ]
@@ -75,3 +78,12 @@ def getuserinfo(request):
     else:
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data)
+
+# 'api/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
+@api_view(['POST'])
+def getjointpoint(request):
+    # POST 요청 처리
+    if request.method == 'POST':
+        data = request.data
+        print(data)
+        return Response("데이터 잘 받았습니다.")
