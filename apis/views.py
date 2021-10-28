@@ -4,6 +4,8 @@ from rest_framework.response import Response
 
 from .serializer import UserSerializer
 from .models import User
+
+import base64
 # Create your views here.
 
 @api_view(['GET'])
@@ -12,21 +14,24 @@ def getRoutes(request):
 
     routes = [
         {
-            # 'api/users/login'
+            # 'apis/users/login'
             'Endpoint': 'api/users/login',
             'method': 'GET', 'POST'
             'body': {"userid", "userpassword"},
             'description': '로그인 성공 여부 판단'
         },
         {
-            # 'api/users/getuserinfo'
+            # 'apis/users/getuserinfo'
             'Endpoint': 'api/users/getuserinfo',
             'method': 'GET',
             'body': {'username'},
             'description': '유저 이름을 받아, 유저 정보 웹으로 전달'
         },
         {
-            # 'api/images
+            # 'apis/images
+        },
+        {
+            # 'apis/images/getjointpoint
         },
         {
             # API 만들때마다 추가
@@ -34,7 +39,7 @@ def getRoutes(request):
     ]
     return Response(routes)
 
-# 'api/users/login' - 유저 로그인 기능 처리 함수
+# 'apis/users/login' - 유저 로그인 기능 처리 함수
 @api_view(['GET', 'POST'])
 def login(request):
     # GET 요청 처리 -> 
@@ -65,7 +70,7 @@ def login(request):
     # Response 응답 고민!
     return Response("응답을 뭘 줄껀지도 고민")
 
-# 'api/users/getuserinfo' - 유저 정보를 웹에 전달해주는 함수
+# 'apis/users/getuserinfo' - 유저 정보를 웹에 전달해주는 함수
 @api_view(['GET'])
 def getuserinfo(request):
 
@@ -79,7 +84,36 @@ def getuserinfo(request):
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data)
 
-# 'api/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
+# 'apis/images' - 유저의 운동이미지를 받아와서 저장하는 함수
+@api_view(['GET', 'POST'])
+def getImages(request):
+    
+    # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
+    if request.method == 'POST':
+        print("Images POST")
+        # POST로 온 데이터 받기
+        data = request.data
+        # data 앞에 쓸모없는 문자열 제거
+        replace_data = data.replace("data:image/jpeg;base64,", '')
+        # 이미지파일로 디코딩한후, 파일에 이미지 데이터 쓰기
+        imgdata = base64.b64decode(replace_data)
+        with open('media/test.jpg', 'wb') as f:
+            f.write(imgdata)
+
+        # 데이터 여러개 받아오는 경우
+        '''
+        data = request.data
+        # base64를 이미지로 바꾸는 과정, test.jpeg에 저장
+        imgdata = base64.b64decode(data["url"])
+        with open('test.jpeg', 'wb') as f:
+            f.write(imgdata)
+        '''
+        # 이미지 모델 저장은 조금 더 고민..
+        #image = Image.objects.create(image_url = binary_data)
+        #serializer = ImageSerializer(image, many=False)
+    return Response()
+
+# 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 @api_view(['POST'])
 def getjointpoint(request):
     # POST 요청 처리

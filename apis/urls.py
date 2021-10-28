@@ -9,6 +9,6 @@ urlpatterns = [
     path('users/getuserinfo', views.getuserinfo, name='getuserinfo'),
     
     # Image 관련 API
+    path('images/', views.getimages, name="getimages"),
     path('images/getjointpoint', views.getjointpoint, name='getjointpoint'),
-    #path('images/', views.getImages, name="getImages"),
 ]
