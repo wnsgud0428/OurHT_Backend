@@ -58,7 +58,7 @@ def find_boarderlinepoint(picture, slope, start_x, start_y, end_x):
     for i in range(start_x, end_x, slope_step):
         new_x, new_y = i, (perpen_line[0] * i) + perpen_line[1]
         new_y = int(round(new_y))
-        while (picture[new_x][new_y][0] != 0 or picture[new_x][new_y][1] != 0 or picture[new_x][new_y][2] == 0):
+        while (picture[new_x][len_y - new_y - 1][0] != 0 or picture[new_x][len_y - new_y - 1][1] != 0 or picture[new_x][len_y - new_y - 1][2] == 0):
             # 직선 따라가면서 경계 찾기
             if new_slope > 0:
                 new_x += slope_step
