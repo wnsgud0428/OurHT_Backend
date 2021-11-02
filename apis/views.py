@@ -124,6 +124,29 @@ def getimages(request):
 def getjointpoint(request):
     # POST 요청 처리
     if request.method == "POST":
-        data = request.data
-        print(data)
-        return Response("데이터 잘 받았습니다.")
+        left_shoulder_x = request.data["keypoints"][5]["position"]["x"]
+        right_shoulder_x = request.data["keypoints"][6]["position"]["x"]
+        diff = abs(left_shoulder_x - right_shoulder_x)
+
+        left_ankle_x = request.data["keypoints"][15]["position"]["x"]
+        left_ankle_y = request.data["keypoints"][15]["position"]["y"]
+
+        # 발목 보이는거를 위해
+        len = 480 - left_ankle_y
+        print(len)
+        if len > 30:
+            print("발목이 보여요!")
+
+        # 중앙 정렬을 위해
+        # print(left_ankle_x)
+        # if 250 < left_ankle_x < 390:
+        #     print("중앙정렬 완료")
+        # else:
+        #     print("너무 쳐져있어요!")
+
+        # 측면정렬을 위해
+        # print(diff)
+        if diff < 20:
+            # print("옆으로 잘 섰네요")
+            return Response("측면정렬 완료!")
+        return Response("측면정렬 미완료!")
