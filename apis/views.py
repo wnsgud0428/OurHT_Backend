@@ -86,7 +86,7 @@ def getuserinfo(request):
 
 # 'apis/images' - 유저의 운동이미지를 받아와서 저장하는 함수
 @api_view(['GET', 'POST'])
-def getImages(request):
+def getimages(request):
     
     # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
     if request.method == 'POST':
@@ -120,4 +120,6 @@ def getjointpoint(request):
     if request.method == 'POST':
         data = request.data
         print(data)
+        # 개별 요소 접근 방법 
+        # print(data["keypoints"][1]["position"]["x"])
         return Response("데이터 잘 받았습니다.")
