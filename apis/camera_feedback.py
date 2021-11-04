@@ -1,6 +1,3 @@
-from rest_framework.response import Response
-
-
 def cameraSetting(request):
     # 각 조건을 만족하는지 검사하기 위함
     is_ankle_show = False
