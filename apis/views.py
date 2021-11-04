@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from .serializer import UserSerializer
 from .models import User
 
+from . import feedback
 import base64
+
 
 # Create your views here.
 
@@ -120,12 +122,28 @@ def getimages(request):
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
+# dynamic_data - 동적인 데이터 위해
+'''
+dynamic_data = []
+count = 0
+'''
 @api_view(["POST"])
 def getjointpoint(request):
+    '''
+    global dynamic_data
+    global count
+    '''
     # POST 요청 처리
     if request.method == "POST":
         data = request.data
-        print(data)
-        # 개별 요소 접근 방법 
-        # print(data["keypoints"][1]["position"]["x"])
-        return Response("데이터 잘 받았습니다.")
+        '''
+        dynamic_data.append(data)
+        count += 1
+        if count == 10:
+            dynamic_data = []
+            print("Clear Data!")
+            count = 0
+        '''
+        #RangeofmotionFlag = feedback.checkRangeofmotion(data)
+        #KneepositionFlag = feedback.checkKneeposition(data)
+        return Response()
