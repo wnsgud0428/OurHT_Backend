@@ -1,4 +1,4 @@
-def cameraSetting(request):
+def isCameraSetted(request):
     # 각 조건을 만족하는지 검사하기 위함
     is_ankle_show = False
     is_ankle_mid = False
