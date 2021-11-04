@@ -6,7 +6,8 @@ from .serializer import UserSerializer
 from .models import User
 
 import base64
-from .camera_feedback import cameraSetting
+from .camera_feedback import isCameraSetted
+from .pose_feedback import isUpperbodyNotBent
 
 # Create your views here.
 
@@ -125,7 +126,8 @@ def getimages(request):
 def getjointpoint(request):
     # POST 요청 처리
     if request.method == "POST":
-        camSetFlag = cameraSetting(request)
+        camSetFlag = isCameraSetted(request)
+        isUpperbodyNotBent(request)
         if camSetFlag == True:
             return Response("카메라 세팅 완료")
         else:
