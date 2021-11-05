@@ -146,4 +146,5 @@ def getjointpoint(request):
         '''
         #RangeofmotionFlag = feedback.checkRangeofmotion(data)
         #KneepositionFlag = feedback.checkKneeposition(data)
+        #CenterofgraityFlag = feedback.checkCenterofgravity(data)
         return Response()

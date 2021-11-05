@@ -66,3 +66,31 @@ def checkCenterofgravity(data):
     # 좌표 받아오기
     left_shoulder = data["keypoints"][5]["position"]
     right_shoulder = data["keypoints"][6]["position"]
+    left_waist = data["keypoints"][11]["position"]
+    right_waist = data["keypoints"][12]["position"]
+    left_knee = data["keypoints"][13]["position"]
+    right_knee = data["keypoints"][14]["position"]
+    left_ankle = data["keypoints"][15]["position"]
+    right_ankle = data["keypoints"][16]["position"]
+
+    # 관절 좌, 우 중심점 찾기
+    shoulder = [(left_shoulder["x"] + right_shoulder["x"]) / 2, (left_shoulder["y"] + right_shoulder["y"]) / 2]
+    waist = [(left_waist["x"] + right_waist["x"]) / 2, (left_waist["y"] + right_waist["y"]) / 2]
+    knee = [(left_knee["x"] + right_knee["x"]) / 2, (left_knee["y"] + right_knee["y"]) / 2]
+    ankle = [(left_ankle["x"] + right_ankle["x"]) / 2, (left_ankle["y"] + right_ankle["y"]) / 2]
+
+    # 어깨가 무릎보다 앞으로 나오면 무게중심이 너무 앞으로 쏠린 경우임
+    if waist[0] > knee[0]:              # 왼쪽을 보며 스쿼트하는 경우
+        if shoulder[0] < knee[0]:
+            return False
+    else:                               # 오른쪽을 보며 스쿼트하는 경우
+        if shoulder[0] > knee[0]:
+            return False
+    
+    # 어깨와 발목이 비슷한 좌표 포인트에서 움직이는지 판단!
+    diff = numpy.abs(shoulder[0] - ankle[0])
+    if diff < 50:
+        return True
+    else:
+        return False 
+
