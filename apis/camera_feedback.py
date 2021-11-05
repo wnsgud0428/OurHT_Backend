@@ -39,7 +39,7 @@ def isCameraSetted(request):
         is_shoulder_sideview = False
         print("몸을 틀어, 측면이 잘 보이도록 조정해주세요!")
 
-    if is_ankle_show and is_ankle_mid == True:
+    if is_ankle_mid == True:
         return True
     else:
         return False
