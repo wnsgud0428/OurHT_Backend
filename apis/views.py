@@ -92,9 +92,9 @@ def getuserinfo(request):
 
 
 # 'apis/images' - 유저의 운동이미지를 받아와서 저장하는 함수
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def getimages(request):
-    
+
     # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
     if request.method == "POST":
         print("Images POST")
@@ -123,28 +123,30 @@ def getimages(request):
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 # dynamic_data - 동적인 데이터 위해
-'''
+"""
 dynamic_data = []
 count = 0
-'''
+"""
+
+
 @api_view(["POST"])
 def getjointpoint(request):
-    '''
+    """
     global dynamic_data
     global count
-    '''
+    """
     # POST 요청 처리
     if request.method == "POST":
         data = request.data
-        '''
+        """
         dynamic_data.append(data)
         count += 1
         if count == 10:
             dynamic_data = []
             print("Clear Data!")
             count = 0
-        '''
-        #RangeofmotionFlag = feedback.checkRangeofmotion(data)
-        #KneepositionFlag = feedback.checkKneeposition(data)
-        #CenterofgraityFlag = feedback.checkCenterofgravity(data)
+        """
+        RangeofmotionFlag = feedback.checkRangeofmotion(data)
+        KneepositionFlag = feedback.checkKneeposition(data)
+        CenterofgraityFlag = feedback.checkCenterofgravity(data)
         return Response()
