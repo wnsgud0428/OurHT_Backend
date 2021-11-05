@@ -58,9 +58,11 @@ def checkKneeposition(data):
     else:
         knee_to_ankle_degree = util.calculate_angle([-1, knee_to_ankle_slope], [0, 0], [-1, 0])
 
-    print(waist_to_knee_degree, knee_to_ankle_degree)
-
-    return False
+    # 최종 판단
+    if waist_to_knee_degree < 10 and knee_to_ankle_degree > 45:
+        return True
+    else:
+        return False
 
 def checkCenterofgravity(data):
     # 좌표 받아오기
