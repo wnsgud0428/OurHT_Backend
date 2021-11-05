@@ -75,7 +75,7 @@ def isUpperbodyNotBent(request):
 
     if 45 < shoulder_hip_knee_angle < 180:
         is_upperbody_not_bent = True
-        print("적당한 각도에요")
+        print("적당하게 숙인 각도에요")
     elif shoulder_hip_knee_angle <= 45:
         is_upperbody_not_bent = False
         print("너무 굽었어요!")
@@ -84,6 +84,44 @@ def isUpperbodyNotBent(request):
         print("몸을 뒤로 제끼면 안되죠!")
 
     if is_upperbody_not_bent == True:
+        return True
+    else:
+        return False
+
+
+# 눈-귀-어깨 각도 비교
+def isFaceForward(request):
+    is_face_forward = False
+
+    left_eye_x = request.data["keypoints"][1]["position"]["x"]
+    left_eye_y = request.data["keypoints"][1]["position"]["y"]
+
+    left_ear_x = request.data["keypoints"][3]["position"]["x"]
+    left_ear_y = request.data["keypoints"][3]["position"]["y"]
+
+    left_shoulder_x = request.data["keypoints"][5]["position"]["x"]
+    left_shoulder_y = request.data["keypoints"][5]["position"]["y"]
+
+    left_eye = [left_eye_x, left_eye_y]
+    left_ear = [left_ear_x, left_ear_y]
+    left_shoulder = [left_shoulder_x, left_shoulder_y]
+
+    eye_ear_shoulder_angle = calculate_angle(left_eye, left_ear, left_shoulder)
+
+    ###스쿼트시 고개를 잘 유지하는지
+    print(f"눈-귀-어깨 각도:{eye_ear_shoulder_angle}")
+
+    if 70 < eye_ear_shoulder_angle < 90:
+        is_face_forward = True
+        print("적당히 고개를 들었어요")
+    elif eye_ear_shoulder_angle >= 90:
+        is_face_forward = False
+        print("고개를 너무 들었어요!")
+    elif eye_ear_shoulder_angle <= 70:
+        is_face_forward = None
+        print("고개를 너무 숙였어요!")
+
+    if is_face_forward == True:
         return True
     else:
         return False

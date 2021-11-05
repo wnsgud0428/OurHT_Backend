@@ -7,7 +7,7 @@ from .models import User
 
 import base64
 from .camera_feedback import isCameraSetted
-from .pose_feedback import isUpperbodyNotBent
+from .pose_feedback import isFaceForward, isUpperbodyNotBent
 
 # Create your views here.
 
@@ -128,6 +128,7 @@ def getjointpoint(request):
     if request.method == "POST":
         camSetFlag = isCameraSetted(request)
         isUpperbodyNotBent(request)
+        isFaceForward(request)
         if camSetFlag == True:
             return Response("카메라 세팅 완료")
         else:
