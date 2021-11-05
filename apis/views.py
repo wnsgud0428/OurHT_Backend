@@ -5,9 +5,11 @@ from rest_framework.response import Response
 from .serializer import UserSerializer
 from .models import User
 
+from . import feedback
 import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
+
 
 # Create your views here.
 
@@ -122,14 +124,32 @@ def getimages(request):
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
+# dynamic_data - 동적인 데이터 위해
+"""
+dynamic_data = []
+count = 0
+"""
+
+
 @api_view(["POST"])
 def getjointpoint(request):
+    """
+    global dynamic_data
+    global count
+    """
     # POST 요청 처리
     if request.method == "POST":
+        # 준형
         camSetFlag = isCameraSetted(request)
-        isUpperbodyNotBent(request)
-        isFaceForward(request)
+        # isUpperbodyNotBent(request)  # 테스트 완료
+        # isFaceForward(request)  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+
+        # 병주
+        data = request.data
+        # RangeofmotionFlag = feedback.checkRangeofmotion(data) #잘됨
+        # KneepositionFlag = feedback.checkKneeposition(data) #잘됨
+        # CenterofgraityFlag = feedback.checkCenterofgravity(data) #잘됨
         if camSetFlag == True:
-            return Response("카메라 세팅 완료")
+            return Response(" ")
         else:
             return Response("카메라 세팅 다시 하세요")

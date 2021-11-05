@@ -1,170 +1,141 @@
-# 피드백 함수들 로직 구현 중
+import util, numpy
 
-# 이미지는 3차원 배열로 rgb 값을 받아올 수 있음!
-# ex) image[a][b] => 배열 인덱스 (a, b)부분의 [b, g, r] 값이 담겨있음! (r - g - b 순서 아님!)
-#     이미지의 투명한 부분은 [0, 0, 0]으로 표현됌!
-import numpy as np
-import math, cv2
-import util
 
-def feedback_squrt():
+def checkRangeofmotion(data):
+    # 좌표 받아오기
+    left_waist = data["keypoints"][11]["position"]
+    right_waist = data["keypoints"][12]["position"]
+    left_knee = data["keypoints"][13]["position"]
+    right_knee = data["keypoints"][14]["position"]
+    left_ankle = data["keypoints"][15]["position"]
+    right_ankle = data["keypoints"][16]["position"]
 
-    # check_head() - 목 & 머리 체크 함수
-    '''
-    허리 - 등 - 목으로 이어지는 직선 체크
-    측면에서 귀의 좌표가 찍히는지?
-    '''
-    # check_back() - 등 체크 함수
-    '''
-    배경 제거 이미지와 응용하여 등의 굽음 측정
-    '''
-    # check_waist() - 허리 체크 함수
-    '''
-    무릎과 골반 좌표 활용해, 너무 앉거나 일어서지는 
-    않았는지 체크
-    '''
-    # check_knee() - 무릎 체크 함수
-    '''
-    발목과의 좌표 비교, 굳이 발 끝이 아니여도 된다
-    '''
-    # check_dynamic() - 동적 정보 체크 함수
-    '''
-    어깨가 위 아래로만 왔다갔다 하는지
-    즉, 일정하게 몸이 위아래로 움직이는지
-    '''
-    pass
+    # 관절 좌, 우 중심점 찾기
+    waist = [
+        (left_waist["x"] + right_waist["x"]) / 2,
+        (left_waist["y"] + right_waist["y"]) / 2,
+    ]
+    knee = [
+        (left_knee["x"] + right_knee["x"]) / 2,
+        (left_knee["y"] + right_knee["y"]) / 2,
+    ]
+    ankle = [
+        (left_ankle["x"] + right_ankle["x"]) / 2,
+        (left_ankle["y"] + right_ankle["y"]) / 2,
+    ]
 
-def feedback_pushup():
-
-    # check_head() - 목 & 머리 체크 함수
-    '''
-    스쿼트에서 쓰는 목 & 머리 체크 방식과 동일할 듯
-    '''
-    # check_back() - 등 체크 함수
-    '''
-    스쿼트에서 쓰는 등 체크 방식과 동일할 듯
-    '''
-    # check_elbow() - 팔꿈치 체크 함수
-    '''
-    팔꿈치의 위치가 몸통 위에서 1/3 지점(정확히 체크)
-    어깨&골반&팔꿈치 좌표 활용하여 판단
-    '''
-    # check_lower_body() - 하반신 체크 함수
-    '''
-    골반 - 무릎 - 발목이 잘 이어지나 체크
-    '''
-    # check_dynamic() - 동적 정보 체크 함수
-    '''
-    좌표변화가 가장 큰 어깨 기준으로 가동범위 판단
-    온 몸이 균일하게 잘 내려가고 올라오는지!
-    '''
-    pass
-
-def feedback_plank():
-
-    # check_head() - 목 & 머리 체크 함수
-    '''
-    스쿼트에서 쓰는 목 & 머리 체크 방식과 동일할 듯
-    '''
-    # check_shoulder() - 어깨 체크 함수 -> 필요한가?
-    # check_elbow() - 팔꿈치 체크 함수
-    '''
-    푸쉬업에서 쓰는 팔꿈치 체크 방식과 동일할 듯
-    '''
-    # check_dynamic() - 동적 정보 체크 함수
-    '''
-    초기 자세를 기준으로, 
-    몸의 자세가 흐트러지지 않는지 판단
-    '''
-    pass
-
-# 목 - 머리 체크 함수
-def check_head():
-    # 어깨 위로는 어떻게 판단할지? 귀 좌표로 판단?
-    pass
-
-# 등 체크 함수
-def check_back():
-    ''' 등의 굽음 정도 체크 '''
-
-    # 배경 제거된 그림 받아와야 함
-    picture = []
-
-    # 허리 좌,우 좌표를 통해 허리 중심좌표 생성
-    left_waist, right_waist = [0, 0], [0, 0]
-    waist = [(left_waist[0] + right_waist[0]) / 2, (left_waist[1] + right_waist[1]) / 2] 
-
-    # 어깨 좌,우 좌표를 통해 어깨 중심좌표 생성
-    left_shoulder, right_shoulder = 0, 0
-    shoulder = [(left_shoulder[0] + right_shoulder[0]) / 2, (left_shoulder[1] + right_shoulder[1]) / 2]
-
-    # 허리 - 어깨를 이은 선을 토대로, 등의 윤곽선과의 거리 측정
-    slope = util.find_straightslope(waist[0], waist[1], shoulder[0], shoulder[1])
-    distance_arr = util.find_distancefromboarderline(picture, slope, waist[0], waist[1], shoulder[0])
-
-    # 거리의 최댓값과 최솟값의 차
-    diff = max(distance_arr) - min(distance_arr)
-
-    ## 이제 이 정보들 가지고 어떻게 등이 안굽었는지 체크를 해야함
-    ## 벗 윙크 자세도 판단
-    pass
-
-# 팔꿈치 체크 함수
-def check_elbow():
-    ''' 팔꿈치의 위치가 몸통 기준 어디인지? 일단 1/3 기준으로 작성 '''
-
-    # 허리 좌,우 좌표를 통해 허리 중심좌표 생성
-    left_waist, right_waist = [0, 0], [0, 0]
-    waist = [(left_waist[0] + right_waist[0]) / 2, (left_waist[1] + right_waist[1]) / 2] 
-
-    # 어깨 좌,우 좌표를 통해 어깨 중심좌표 생성
-    left_shoulder, right_shoulder = 0, 0
-    shoulder = [(left_shoulder[0] + right_shoulder[0]) / 2, (left_shoulder[1] + right_shoulder[1]) / 2]
-
-    # 팔꿈치 좌,우 좌표를 통해 팔꿈치 중심좌표 생성
-    left_elbow, right_elbow = 0, 0
-    elbow = [(left_elbow[0] + right_elbow[0]) / 2, (left_elbow[1] + right_elbow[1]) / 2]
-
-    ## 이제 이 정보들 가지고 팔꿈치의 위치가 적절한지 판단해야 함
-    pass
-
-# 허리 체크 
-def check_waist():
-    pass
-
-# 무릎 체크
-def check_knee():
-    pass
-
-# 하체 체크
-def check_lower_body():
-    ''' 골반 - 무릎 - 발목이 일직선으로 잘 이어지는 판단 '''
-
-    # 허리 좌,우 좌표를 통해 허리 중심좌표 생성
-    left_waist, right_waist = [0, 0], [0, 0]
-    waist = [(left_waist[0] + right_waist[0]) / 2, (left_waist[1] + right_waist[1]) / 2] 
-
-    # 무릎 좌,우 좌표를 통해 무릎 중심좌표 생성
-    left_knee, right_knee = [0, 0], [0, 0]
-    knee = [(left_knee[0] + right_knee[0]) / 2, (left_knee[1] + right_knee[1]) / 2]
-
-    # 발목 좌,우 좌표를 통해 무릎 중심좌표 생성
-    left_ankle, right_ankle = [0, 0], [0, 0]
-    ankle = [(left_ankle[0] + right_ankle[0]) / 2, (left_ankle[1] + right_ankle[1]) / 2]
-
-    # 두 직선으로 나누어, 각각의 기울기 구함
+    # 골반 - 무릎의 직선 기울기 찾기
     waist_to_knee_slope = util.find_straightslope(waist[0], waist[1], knee[0], knee[1])
+
+    # 골반 - 무릎 - 발목 각도 찾기
+    between_degree = util.calculate_angle(waist, knee, ankle)
+    # print(between_degree)
+
+    # 최종 자세판단
+    if numpy.abs(waist_to_knee_slope) < 5:
+        if between_degree > 50 and between_degree < 90:
+            print("1-2: 가동범위 굿")
+            return True
+    else:
+        return False
+
+
+def checkKneeposition(data):
+    # 좌표 받아오기
+    left_waist = data["keypoints"][11]["position"]
+    right_waist = data["keypoints"][12]["position"]
+    left_knee = data["keypoints"][13]["position"]
+    right_knee = data["keypoints"][14]["position"]
+    left_ankle = data["keypoints"][15]["position"]
+    right_ankle = data["keypoints"][16]["position"]
+
+    # 관절 좌, 우 중심점 찾기
+    waist = [
+        (left_waist["x"] + right_waist["x"]) / 2,
+        (left_waist["y"] + right_waist["y"]) / 2,
+    ]
+    knee = [
+        (left_knee["x"] + right_knee["x"]) / 2,
+        (left_knee["y"] + right_knee["y"]) / 2,
+    ]
+    ankle = [
+        (left_ankle["x"] + right_ankle["x"]) / 2,
+        (left_ankle["y"] + right_ankle["y"]) / 2,
+    ]
+
+    # 골반 - 무릎의 직선 기울기 / 각도 찾기
+    waist_to_knee_slope = util.find_straightslope(waist[0], waist[1], knee[0], knee[1])
+
+    if waist_to_knee_slope > 0:
+        waist_to_knee_degree = util.calculate_angle(
+            [1, waist_to_knee_slope], [0, 0], [1, 0]
+        )
+    else:
+        waist_to_knee_degree = util.calculate_angle(
+            [-1, waist_to_knee_slope], [0, 0], [-1, 0]
+        )
+
+    # 무릎 - 발목의 직선 기울기 / 각도 찾기
     knee_to_ankle_slope = util.find_straightslope(knee[0], knee[1], ankle[0], ankle[1])
 
-    # 골반 - 발목 총 직선 기울기
-    lower_body_slope = util.find_straightslope(waist[0], waist[1], ankle[0], ankle[1])
+    if knee_to_ankle_slope > 0:
+        knee_to_ankle_degree = util.calculate_angle(
+            [1, knee_to_ankle_slope], [0, 0], [1, 0]
+        )
+    else:
+        knee_to_ankle_degree = util.calculate_angle(
+            [-1, knee_to_ankle_slope], [0, 0], [-1, 0]
+        )
 
-    ## 이제 이 정보들 가지고 하체 체크
-    ''' 골반과 발목 잇는 직선 기준, 무릎이 아래쪽이면 무릎이 굽혔다? '''
+    # 최종 판단
+    if waist_to_knee_degree < 10 and knee_to_ankle_degree > 45:
+        print("2-1: 무릎이 적당하게 나감")
+        return True
+    else:
+        return False
 
-    pass
 
-# 동적인 정보 활용
-def check_dynamic():
-    # 각 운동에서 활용해야 하는 정보들이 다르므로, 운동마다 별개로 만들어야 할듯?
-    pass
+def checkCenterofgravity(data):
+    # 좌표 받아오기
+    left_shoulder = data["keypoints"][5]["position"]
+    right_shoulder = data["keypoints"][6]["position"]
+    left_waist = data["keypoints"][11]["position"]
+    right_waist = data["keypoints"][12]["position"]
+    left_knee = data["keypoints"][13]["position"]
+    right_knee = data["keypoints"][14]["position"]
+    left_ankle = data["keypoints"][15]["position"]
+    right_ankle = data["keypoints"][16]["position"]
+
+    # 관절 좌, 우 중심점 찾기
+    shoulder = [
+        (left_shoulder["x"] + right_shoulder["x"]) / 2,
+        (left_shoulder["y"] + right_shoulder["y"]) / 2,
+    ]
+    waist = [
+        (left_waist["x"] + right_waist["x"]) / 2,
+        (left_waist["y"] + right_waist["y"]) / 2,
+    ]
+    knee = [
+        (left_knee["x"] + right_knee["x"]) / 2,
+        (left_knee["y"] + right_knee["y"]) / 2,
+    ]
+    ankle = [
+        (left_ankle["x"] + right_ankle["x"]) / 2,
+        (left_ankle["y"] + right_ankle["y"]) / 2,
+    ]
+
+    # 어깨가 무릎보다 앞으로 나오면 무게중심이 너무 앞으로 쏠린 경우임
+    if waist[0] > knee[0]:  # 왼쪽을 보며 스쿼트하는 경우
+        if shoulder[0] < knee[0]:
+            return False
+    else:  # 오른쪽을 보며 스쿼트하는 경우
+        if shoulder[0] > knee[0]:
+            return False
+
+    # 어깨와 발목이 비슷한 좌표 포인트에서 움직이는지 판단!
+    diff = numpy.abs(shoulder[0] - ankle[0])
+    if diff < 50:
+        print("2-2: 무게중심 적절함")
+        return True
+    else:
+        return False

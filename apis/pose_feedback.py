@@ -70,16 +70,16 @@ def isUpperbodyNotBent(request):
     hip_knee_ankle_angle = calculate_angle(left_hip, left_knee, left_ankle)
 
     ### 발목의 중앙 정렬을 위해 --> 정확도 향상을 하려면 left_ankle뿐만 아니라 right_ankle도 고려해야됨
-    print(f"어깨-엉덩이-무릎 각도:{shoulder_hip_knee_angle}")
-    print(f"엉덩이-무릎-발목 각도:{hip_knee_ankle_angle}")
+    # print(f"어깨-엉덩이-무릎 각도:{shoulder_hip_knee_angle}")
+    # print(f"엉덩이-무릎-발목 각도:{hip_knee_ankle_angle}")
 
-    if 45 < shoulder_hip_knee_angle < 180:
+    if 50 < shoulder_hip_knee_angle < 90:
         is_upperbody_not_bent = True
-        print("적당하게 숙인 각도에요")
-    elif shoulder_hip_knee_angle <= 45:
+        print("2-3: 적당하게 숙인 각도에요")
+    elif shoulder_hip_knee_angle <= 50:
         is_upperbody_not_bent = False
         print("너무 굽었어요!")
-    elif shoulder_hip_knee_angle > 180:
+    elif shoulder_hip_knee_angle >= 180:
         is_upperbody_not_bent = None
         print("몸을 뒤로 제끼면 안되죠!")
 
@@ -109,11 +109,12 @@ def isFaceForward(request):
     eye_ear_shoulder_angle = calculate_angle(left_eye, left_ear, left_shoulder)
 
     ###스쿼트시 고개를 잘 유지하는지
-    print(f"눈-귀-어깨 각도:{eye_ear_shoulder_angle}")
+    # print(f"눈-귀-어깨 각도:{eye_ear_shoulder_angle}")
 
+    print(eye_ear_shoulder_angle)
     if 70 < eye_ear_shoulder_angle < 90:
         is_face_forward = True
-        print("적당히 고개를 들었어요")
+        print("2-4: 적당히 고개를 들었어요")
     elif eye_ear_shoulder_angle >= 90:
         is_face_forward = False
         print("고개를 너무 들었어요!")
