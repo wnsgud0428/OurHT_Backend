@@ -125,18 +125,14 @@ def getimages(request):
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 # dynamic_data - 동적인 데이터 위해
-"""
 dynamic_data = []
 count = 0
-"""
-
 
 @api_view(["POST"])
 def getjointpoint(request):
-    """
+
     global dynamic_data
     global count
-    """
     # POST 요청 처리
     if request.method == "POST":
         # 준형
@@ -146,9 +142,32 @@ def getjointpoint(request):
 
         # 병주
         data = request.data
-        # RangeofmotionFlag = feedback.checkRangeofmotion(data) #잘됨
+        RangeofmotionFlag = feedback.checkRangeofmotion(data) #잘됨
         # KneepositionFlag = feedback.checkKneeposition(data) #잘됨
         # CenterofgraityFlag = feedback.checkCenterofgravity(data) #잘됨
+
+        if camSetFlag == True and RangeofmotionFlag == True:
+            dynamic_data.append(data)
+            count += 1
+            min_y = 9999
+            if count == 5:
+                for i in range (5):
+                    left_waist = dynamic_data[i]["keypoints"][11]["position"]
+                    right_waist = dynamic_data[i]["keypoints"][12]["position"]
+                    waist = [
+                                (left_waist["x"] + right_waist["x"]) / 2,
+                                (left_waist["y"] + right_waist["y"]) / 2,
+                            ]
+                    if min_y > waist:
+                        min_y = waist
+                        min_index = i
+                UpperbodyFlag = isUpperbodyNotBent(request.data[min_index])  
+                FaceForwardFlag = isFaceForward(request.data[min_index])
+                KneepositionFlag = feedback.checkKneeposition(dynamic_data[min_index]) 
+                CenterofgraityFlag = feedback.checkCenterofgravity(dynamic_data[min_index]) 
+                dynamic_data = []
+                count = 0
+
         if camSetFlag == True:
             return Response(" ")
         else:
