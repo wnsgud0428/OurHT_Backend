@@ -1,6 +1,6 @@
 import util, numpy
 
-
+# 중간 상태 추가
 def checkRangeofmotion(data):
     # 좌표 받아오기
     left_waist = data["keypoints"][11]["position"]

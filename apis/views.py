@@ -127,13 +127,14 @@ def getimages(request):
 # dynamic_data - 동적인 데이터 위해
 dynamic_data = []
 count = 0
+count_start = False
 
 @api_view(["POST"])
 def getjointpoint(request):
 
     global dynamic_data
     global count
-    count_start = False
+    global count_start
 
     # POST 요청 처리
     if request.method == "POST":
