@@ -153,13 +153,10 @@ def getjointpoint(request):
             
             if count == 0:
                 count_start = True
-
             dynamic_data.append(data)
             count += 1
             min_y = 9999
-
             if count == 5:
-
                 for i in range (5):
                     left_waist = dynamic_data[i]["keypoints"][11]["position"]
                     right_waist = dynamic_data[i]["keypoints"][12]["position"]
@@ -175,7 +172,8 @@ def getjointpoint(request):
                 #FaceForwardFlag = isFaceForward(request.data[min_index])
                 KneepositionFlag = feedback.checkKneeposition(dynamic_data[min_index]) 
                 CenterofgraityFlag = feedback.checkCenterofgravity(dynamic_data[min_index]) 
-                
+                # OpenCv 통한 등 분석 함수 추가
+                # 스쿼트 카운팅, 결과 저장
                 dynamic_data = []
                 count = 0
                 count_start = False
