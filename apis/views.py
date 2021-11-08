@@ -133,6 +133,8 @@ def getjointpoint(request):
 
     global dynamic_data
     global count
+    count_start = False
+
     # POST 요청 처리
     if request.method == "POST":
         # 준형
@@ -146,11 +148,17 @@ def getjointpoint(request):
         # KneepositionFlag = feedback.checkKneeposition(data) #잘됨
         # CenterofgraityFlag = feedback.checkCenterofgravity(data) #잘됨
 
-        if camSetFlag == True and RangeofmotionFlag == True:
+        if (camSetFlag == True and RangeofmotionFlag == True) or count_start == True:
+            
+            if count == 0:
+                count_start = True
+
             dynamic_data.append(data)
             count += 1
             min_y = 9999
+
             if count == 5:
+
                 for i in range (5):
                     left_waist = dynamic_data[i]["keypoints"][11]["position"]
                     right_waist = dynamic_data[i]["keypoints"][12]["position"]
@@ -158,15 +166,18 @@ def getjointpoint(request):
                                 (left_waist["x"] + right_waist["x"]) / 2,
                                 (left_waist["y"] + right_waist["y"]) / 2,
                             ]
-                    if min_y > waist:
-                        min_y = waist
+                    if min_y > waist[1]:
+                        min_y = waist[1]
                         min_index = i
-                UpperbodyFlag = isUpperbodyNotBent(request.data[min_index])  
-                FaceForwardFlag = isFaceForward(request.data[min_index])
+
+                #UpperbodyFlag = isUpperbodyNotBent(request.data[min_index])  
+                #FaceForwardFlag = isFaceForward(request.data[min_index])
                 KneepositionFlag = feedback.checkKneeposition(dynamic_data[min_index]) 
                 CenterofgraityFlag = feedback.checkCenterofgravity(dynamic_data[min_index]) 
+                
                 dynamic_data = []
                 count = 0
+                count_start = False
 
         if camSetFlag == True:
             return Response(" ")
