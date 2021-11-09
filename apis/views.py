@@ -9,7 +9,7 @@ from . import feedback
 import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
-
+from .squat_state_check import returnSquatState
 
 # Create your views here.
 
@@ -149,6 +149,10 @@ def getjointpoint(request):
         # RangeofmotionFlag = feedback.checkRangeofmotion(data) #잘됨
         # KneepositionFlag = feedback.checkKneeposition(data) #잘됨
         # CenterofgraityFlag = feedback.checkCenterofgravity(data) #잘됨
+
+        if camSetFlag == True:
+            squat_state = returnSquatState(data)
+
         if camSetFlag == True:
             return Response(" ")
         else:
