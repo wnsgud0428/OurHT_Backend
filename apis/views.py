@@ -130,13 +130,11 @@ dynamic_data = []
 count = 0
 """
 
+pose_list = []
+
 
 @api_view(["POST"])
 def getjointpoint(request):
-    """
-    global dynamic_data
-    global count
-    """
     # POST 요청 처리
     if request.method == "POST":
         # 준형
@@ -152,6 +150,18 @@ def getjointpoint(request):
 
         if camSetFlag == True:
             squat_state = returnSquatState(data)
+            if squat_state == "squat":
+                # request.data(관절포인트)를 처리하는 함수?
+                # 어떤 처리를 해야되는가? 제일 y값이 큰 부분(제일 많이 앉은 부분)
+                pose_list.append(data)
+            else:
+                # pose_list처리 함수
+                pose_list_for_hip_y = []
+                for p in pose_list:
+                    pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
+                # print(pose_list_for_hip_y)
+                max_hip_y = max(pose_list_for_hip_y)
+                pose_list.clear()
 
         if camSetFlag == True:
             return Response(" ")
