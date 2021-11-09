@@ -1,4 +1,6 @@
 def isCameraSetted(request):
+    camera_width = 640
+    mid = camera_width / 2
     # 각 조건을 만족하는지 검사하기 위함
     is_ankle_show = False
     is_ankle_mid = False
@@ -19,7 +21,7 @@ def isCameraSetted(request):
 
     ### 발목의 중앙 정렬을 위해 --> 정확도 향상을 하려면 left_ankle뿐만 아니라 right_ankle도 고려해야됨
     # print(f"발목 x좌표:{left_ankle_x}")
-    if 250 < left_ankle_x < 390:
+    if mid - 100 < left_ankle_x < mid + 100:  #
         is_ankle_mid = True
         # print("1-1-2: 중앙정렬 완료")
     else:
