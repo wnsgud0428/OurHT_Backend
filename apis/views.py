@@ -4,12 +4,12 @@ from rest_framework.response import Response
 
 from .serializer import UserSerializer
 from .models import User
-
 from . import feedback
 import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
+from pose import models as pose_models
 
 # Create your views here.
 
@@ -160,8 +160,13 @@ def getjointpoint(request):
                 for p in pose_list:
                     pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
                 # print(pose_list_for_hip_y)
-                max_hip_y = max(pose_list_for_hip_y)
-                pose_list.clear()
+                if pose_list_for_hip_y:
+                    max_hip_y = max(pose_list_for_hip_y)
+                    print(f"hip_y의 리스트:{pose_list_for_hip_y}")
+                    print(f"max_hip_y 값:{max_hip_y}")
+
+                    pose_models.Pose.objects.create(hip_y=max_hip_y)
+                    pose_list.clear()
 
         if camSetFlag == True:
             return Response(" ")

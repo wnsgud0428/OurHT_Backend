@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Our apps
     "apis.apps.ApisConfig",
+    "pose.apps.PoseConfig",
     # For rest Framework
     "rest_framework",
     "corsheaders",
