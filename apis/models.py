@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+import datetime
 # Create your models here.
 
 # 유저 모델 정의
@@ -16,9 +16,9 @@ class User(models.Model):
 class Feedback(models.Model):
     user = models.ForeignKey("User", related_name="feedbacks", on_delete=models.CASCADE, default=False)
     categori = models.CharField(max_length=10, default="")
-    # day?
+    day = models.DateTimeField("date created", default=datetime.datetime.now)
+    result = models.IntegerField(default="0")
     count = models.IntegerField(default="0")
-    score = models.IntegerField(default="0", validators=[MinValueValidator(0), MaxValueValidator(100)])
 
 # 운동 사진 정의
 class Photo(models.Model):
@@ -26,4 +26,3 @@ class Photo(models.Model):
     # /photos 폴더에 저장
     file = models.ImageField(upload_to="photos")
     feedback = models.ForeignKey("Feedback", related_name="photos", on_delete=models.CASCADE)
-    pass
