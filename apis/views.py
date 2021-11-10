@@ -131,10 +131,12 @@ count = 0
 """
 
 pose_list = []
+is_person_gone_to_stand = "no"
 
 
 @api_view(["POST"])
 def getjointpoint(request):
+    global is_person_gone_to_stand
     # POST 요청 처리
     if request.method == "POST":
         # 준형
@@ -151,22 +153,26 @@ def getjointpoint(request):
         if camSetFlag == True:
             squat_state = returnSquatState(data)
             if squat_state == "squat":
-                # request.data(관절포인트)를 처리하는 함수?
-                # 어떤 처리를 해야되는가? 제일 y값이 큰 부분(제일 많이 앉은 부분)
                 pose_list.append(data)
+                is_person_gone_to_stand = "no"
             else:
-                # pose_list처리 함수
-                pose_list_for_hip_y = []
-                for p in pose_list:
-                    pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
-                # print(pose_list_for_hip_y)
-                if pose_list_for_hip_y:
-                    max_hip_y = max(pose_list_for_hip_y)
-                    print(f"hip_y의 리스트:{pose_list_for_hip_y}")
-                    print(f"max_hip_y 값:{max_hip_y}")
-
-                    pose_models.Pose.objects.create(hip_y=max_hip_y)
-                    pose_list.clear()
+                if squat_state == "stand":
+                    is_person_gone_to_stand = "yes"
+                if is_person_gone_to_stand == "yes":
+                    # pose_list 처리 하는 부분
+                    pose_list_for_hip_y = []
+                    for p in pose_list:
+                        pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
+                    # print(pose_list_for_hip_y)
+                    if pose_list_for_hip_y:
+                        max_hip_y = max(pose_list_for_hip_y)
+                        print(f"hip_y의 리스트:{pose_list_for_hip_y}")
+                        print(f"max_hip_y 값:{max_hip_y}")
+                        pose_models.Pose.objects.create(hip_y=max_hip_y)
+                        pose_list_for_hip_y.clear()
+                        pose_list.clear()
+                else:
+                    pass
 
         if camSetFlag == True:
             return Response(" ")
