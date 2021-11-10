@@ -3,8 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .serializer import UserSerializer
-from .models import User
-from . import feedback
+from users import models as user_models
 import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
@@ -62,8 +61,8 @@ def login(request):
     # 로그인 함수 로직 -> 위의 GET , POST 요청 고민해서 로직 넣어야함!
     input_id = data["userid"]
     input_password = data["userpassword"]
-    user = User.objects.filter(userid=input_id, userpassword=input_password)
-    user_2 = User.objects.filter(userid=input_id)
+    user = user_models.User.objects.filter(userid=input_id, userpassword=input_password)
+    user_2 = user_models.User.objects.filter(userid=input_id)
     if not user and user_2:
         # 아이디는 존재하나, 비밀번호 오류
         print("비번 오류")
@@ -83,7 +82,7 @@ def login(request):
 def getuserinfo(request):
 
     username = request.GET.get("username")
-    user = User.objects.filter(username=username)
+    user = user_models.User.objects.filter(username=username)
 
     if not user:
         # 유저 존재안함! 요청 오류
