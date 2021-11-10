@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Our apps
-    "apis.apps.ApisConfig",
-    "pose.apps.PoseConfig",
+    "apis.apps.ApisConfig", #rest api 사용
+    "pose.apps.PoseConfig", #테스트용
+    "users.apps.UserConfig",
+    "exercises.apps.ExercisesConfig",
     # For rest Framework
     "rest_framework",
     "corsheaders",
