@@ -14,13 +14,29 @@ class ExerciseAdmin(admin.ModelAdmin):
                     "user",
                     "type",
                     "created",
-                    "count_number",
-                    "checklist",
                 ),
             },
         ),
     )
 
+
+@admin.register(models.Motion)
+class MotionAdmin(admin.ModelAdmin):
+    """Motion Admin Definition"""
+
+    fieldsets = (
+        (
+            "Basic Info",
+            {
+                "fields": (
+                    "exercise",
+                    "count_number",
+                    "checklist",
+                    "photo",
+                ),
+            },
+        ),
+    )
     filter_horizontal = ("checklist",)
 
 

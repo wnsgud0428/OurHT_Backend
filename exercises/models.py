@@ -1,5 +1,7 @@
 from django.db import models
 
+import exercises
+
 
 class Exercise(models.Model):
     """Exercise Model Definition"""
@@ -21,22 +23,23 @@ class Exercise(models.Model):
     created = models.DateTimeField(auto_now_add=False, null=True)
     # 원래는 auto_now_add를 True로 해야됨.
     # admin페이지에서 add하여 테스트하기 위해 False로 해놓음.
+
+    def __str__(self):
+        return f"{self.user} - {self.type} - {self.created}"
+
+
+class Motion(models.Model):
+    """Motion Model Definition"""
+
+    exercise = models.ForeignKey("Exercise", on_delete=models.CASCADE)
     count_number = models.IntegerField(null=True)
     checklist = models.ManyToManyField(
         "Checklist", related_name="exercises", blank=True
     )
+    photo = models.ImageField(null=True)
 
     def __str__(self):
-        return f"{self.user} - {self.type} - {self.created} - {self.count_number}/10"
-
-
-class Photo(models.Model):  # rooms앱 -> Photo모델 참고
-    """Photo Model Definition"""
-
-    file = models.ImageField()
-    exercise = models.ForeignKey(
-        "Exercise", related_name="photos", on_delete=models.CASCADE
-    )
+        return f"{self.exercise} - {self.count_number}"
 
 
 class Checklist(models.Model):  # rooms앱 -> Amenity앱 참고
