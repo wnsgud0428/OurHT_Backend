@@ -31,22 +31,29 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Our apps
-    "apis.apps.ApisConfig", #rest api 사용
-    "pose.apps.PoseConfig", #테스트용
-    "users.apps.UserConfig",
-    "exercises.apps.ExercisesConfig",
+]
+
+THIRD_PARTY_APPS = [
     # For rest Framework
     "rest_framework",
     "corsheaders",
 ]
+
+PROJECT_APPS = [
+    "apis.apps.ApisConfig",  # rest api 사용
+    "pose.apps.PoseConfig",  # 테스트용
+    "users.apps.UsersConfig",
+    "exercises.apps.ExercisesConfig",
+]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -136,6 +143,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+
+AUTH_USER_MODEL = "users.User"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
