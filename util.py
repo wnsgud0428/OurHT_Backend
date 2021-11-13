@@ -41,39 +41,41 @@ def find_distancefromline(slope, line_x, line_y, point_x, point_y):
 # print(find_distancefromline())
 
 # 한 직선이 주어지고, 그 직선에 수직인 직선을 따라가면서 그림의 경계점까지의 거리 찾기
+# start_x < end_x 여야함!
 def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
 
     # 그림의 가로, 세로 크기
-    len_y = picture.shape[0]    # 세로
-    len_x = picture.shape[1]    # 가로
+    len_y = picture.shape[0]  # 세로
+    len_x = picture.shape[1]  # 가로
 
-    # 길이를 담은 배열
-    distance_result = []
-    # 좌표를 담은 배열
-    coor_result = []
+    # 결과 길이, 좌표를 담은 배열
+    distance_result, coor_result = [], []
 
     # 주어진 직선 정의
     basic_line = [slope, (-slope * start_x) + start_y]
 
-    # 수직인 직선 정의
-    new_slope = -1/slope
-    perpen_line = [new_slope, (-new_slope * start_x) + start_y]
-
     slope_step = 1
     for i in range(start_x, end_x, slope_step):
-        new_x, new_y = i, (perpen_line[0] * i) + perpen_line[1]
+        new_x, new_y = i, (basic_line[0] * i) + basic_line[1]
         new_y = int(round(new_y))
-        while picture[new_x][len_y - new_y- 1][0] != 0 or picture[new_x][len_y - new_y- 1][1] != 0 or picture[new_x][len_y - new_y- 1][2] == 0:
+        
+        # 매 Point에 대해 수직인 직선 정의
+        new_slope = -1/slope
+        perpen_line = [new_slope, (-new_slope * new_x) + new_y]
+
+        if new_y < 0:
+            break
+        while picture[len_y - new_y][new_x][0] != 0 or picture[len_y - new_y][new_x][1] != 0 or picture[len_y - new_y][new_x][2] != 0:
             # 직선 따라가면서 경계 찾기
             if new_slope > 0:
                 new_x += slope_step
             else:
                 new_x -= slope_step
-            new_y += (perpen_line[0] * new_x) + perpen_line[1]
-            new_y = int(round(new_y))
-            if new_x > len_x or new_x < 0 or new_y > len_y or new_y < 0:
+            new_y = int(round((perpen_line[0] * new_x) + perpen_line[1]))
+            if (new_x >= len_x) or (new_x < 0) or (new_y >= len_y) or (new_y < 0):
                 break
-        distance_result.append(find_distancefromline(slope, i, basic_line[0] * i + basic_line[1], new_x, new_y))
+
+        distance_result.append([i,math.sqrt((i - new_x) * (i - new_x) + (basic_line[0] * i + basic_line[1] - new_y) * (basic_line[0] * i + basic_line[1] - new_y))])
         coor_result.append([new_x, new_y])
 
     return distance_result, coor_result
