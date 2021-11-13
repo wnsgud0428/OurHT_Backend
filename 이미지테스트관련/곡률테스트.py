@@ -42,21 +42,26 @@ def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
     # 그림의 가로, 세로 크기
     len_y = picture.shape[0]  # 세로
     len_x = picture.shape[1]  # 가로
-    print(len_y, len_x)
+    print("length :" , len_y, len_x)
     # 길이, 좌표를 담은 배열
     distance_result, coor_result = [], []
 
     # 주어진 직선 정의
     basic_line = [slope, (-slope * start_x) + start_y]
-
+    print("Basic line :", basic_line)
     # 수직인 직선 정의
     new_slope = -1/slope
     perpen_line = [new_slope, (-new_slope * start_x) + start_y]
+    print("Perpen line :", perpen_line)
 
+    
     slope_step = 1
     for i in range(start_x, end_x, slope_step):
         new_x, new_y = i, (perpen_line[0] * i) + perpen_line[1]
         new_y = int(round(new_y))
+        print("ff", new_x, new_y)
+        '''
+        #print("ff", new_x, new_y)
         if new_y < 0:
             break
         while picture[len_y - new_y - 1][new_x][0] != 0 or picture[len_y - new_y - 1][new_x][1] != 0 or picture[len_y - new_y - 1][new_x][2] != 0:
@@ -67,6 +72,7 @@ def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
                 new_x -= slope_step
             new_y = (perpen_line[0] * new_x) + perpen_line[1]
             new_y = int(round(new_y))
+            #print("Dd", new_x, new_y)
             if (new_x >= len_x) or (new_x < 0) or (new_y >= len_y) or (new_y < 0):
                 break
         print(i, basic_line[0] * i + basic_line[1], new_x, new_y)
@@ -74,14 +80,17 @@ def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
         coor_result.append([new_x, new_y])
 
     return distance_result, coor_result
+    '''
 
 
 testimage = cv2.imread("testimage.png", 1)
 testimage = np.array(testimage)
 print(testimage[341 - 94 - 1][500])
-test_slope = find_straightslope(255, 100, 383, 188)
-test_arr, coor_arr = find_distancefromboarderline(testimage, test_slope, 255, 100, 383)
-#print(test_arr, coor_arr)
-plt.scatter(list(zip(*test_arr))[0], list(zip(*test_arr))[1])
+test_slope = find_straightslope(0, 0, 2, 1)
+find_distancefromboarderline(testimage, test_slope, 2, 1, 3)
+'''
+dist_arr, coor_arr = find_distancefromboarderline(testimage, test_slope, 258, 341 - 103 - 1, 357)
+plt.scatter(list(zip(*dist_arr))[0], list(zip(*dist_arr))[1], 1)
 plt.scatter(list(zip(*coor_arr))[0], list(zip(*coor_arr))[1])
 plt.show()
+'''
