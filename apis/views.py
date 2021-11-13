@@ -8,7 +8,6 @@ import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
-from pose import models as pose_models
 
 # Create your views here.
 
@@ -121,8 +120,6 @@ def getimages(request):
         # serializer = ImageSerializer(image, many=False)
     return Response()
 
-
-# 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 # dynamic_data - 동적인 데이터 위해
 """
 dynamic_data = []
@@ -132,7 +129,7 @@ count = 0
 pose_list = []
 is_person_gone_to_stand = "no"
 
-
+# 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 @api_view(["POST"])
 def getjointpoint(request):
     global is_person_gone_to_stand
@@ -177,3 +174,17 @@ def getjointpoint(request):
             return Response(" ")
         else:
             return Response("카메라 세팅 다시 하세요")
+
+# 'apis/users/feedback - 자세한 피드백을 위해 유저 피드백 내용을 들고와 웹에 뿌려주는 API
+@api_view(['GET'])
+def getuserfeedback(request):
+    
+    if request.method == 'GET':
+        username = request.GET.get("username")
+    
+    '''
+    #장고 ORM에서 찾을때,
+    queryset = exercise_models.Motion.objects.filter(
+        exercise = exercise_modles.Exercise.objects.get(user = 1))
+    )
+    '''

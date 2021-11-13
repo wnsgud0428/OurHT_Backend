@@ -48,7 +48,6 @@ THIRD_PARTY_APPS = [
 
 PROJECT_APPS = [
     "apis.apps.ApisConfig",  # rest api 사용
-    "pose.apps.PoseConfig",  # 테스트용
     "users.apps.UsersConfig",
     "exercises.apps.ExercisesConfig",
 ]
