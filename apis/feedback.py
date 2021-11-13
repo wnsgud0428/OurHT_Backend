@@ -35,9 +35,13 @@ def checkRangeofmotion(data):
     if np.abs(waist_to_knee_slope) < 5:
         if between_degree > 50 and between_degree < 90:
             print("1-2: 가동범위 굿")
-            return True
+            return 3
+        else:
+            return 2
+    elif np.abs(waist_to_knee_slope) > 5 and np.abs(waist_to_knee_slope) < 50:
+        return 2
     else:
-        return False
+        return 1
 
 
 def checkKneeposition(data):
