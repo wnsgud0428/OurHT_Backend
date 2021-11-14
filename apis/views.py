@@ -1,9 +1,10 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .serializer import UserSerializer
+from users import serializer as user_serializer
+from exercises import serializer as exercise_serializer
 from users import models as user_models
+from exercises import models as exercise_models
 import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
@@ -23,19 +24,6 @@ def getRoutes(request):
             "method": "GET",
             "POST" "body": {"userid", "userpassword"},
             "description": "로그인 성공 여부 판단",
-        },
-        {
-            # 'apis/users/getuserinfo'
-            "Endpoint": "api/users/getuserinfo",
-            "method": "GET",
-            "body": {"username"},
-            "description": "유저 이름을 받아, 유저 정보 웹으로 전달",
-        },
-        {
-            # 'apis/images
-        },
-        {
-            # 'apis/images/getjointpoint
         },
         {
             # API 만들때마다 추가
@@ -76,20 +64,41 @@ def login(request):
     return Response("응답을 뭘 줄껀지도 고민")
 
 
-# 'apis/users/getuserinfo' - 유저 정보를 웹에 전달해주는 함수
+# 'apis/users/getexercise' - 유저 정보를 웹에 전달해주는 함수
 @api_view(["GET"])
-def getuserinfo(request):
+def getuserexercise(request):
+    if request.method == 'GET':
+        username = request.GET.get("username")
+        user = user_models.User.objects.get(username=username)
+        if not user:
+            # 유저 존재안함! 요청 오류
+            pass
+        else:
+            queryset = exercise_models.Exercise.objects.get(user = user.id)
+            serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
+            return Response(serializer.data)
 
-    username = request.GET.get("username")
-    user = user_models.User.objects.filter(username=username)
-
-    if not user:
-        # 유저 존재안함! 요청 오류
-        pass
-    else:
-        serializer = UserSerializer(user, many=False)
-        return Response(serializer.data)
-
+# 'apis/users/getfeedback - 자세한 피드백을 위해 유저 피드백 내용을 들고와 웹에 뿌려주는 API
+@api_view(['GET'])
+def getuserfeedback(request):
+    if request.method == 'GET':
+        username = request.GET.get("username")
+        user = user_models.User.objects.get(username = username)
+        if not user:
+            # 찾고자 유저 없는 경우
+            pass
+        else:
+            # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
+            queryset = exercise_models.Motion.objects.filter(
+            exercise = exercise_models.Exercise.objects.get(user = user.id))
+            serializer = exercise_serializer.MotionSerializer(queryset, many=True)
+            return Response(serializer.data)
+    '''
+    #장고 ORM에서 찾을때,
+    queryset = exercise_models.Motion.objects.filter(
+        exercise = exercise_models.Exercise.objects.get(user = 1))
+    )
+    '''
 
 # 'apis/images' - 유저의 운동이미지를 받아와서 저장하는 함수
 @api_view(["GET", "POST"])
@@ -174,17 +183,3 @@ def getjointpoint(request):
             return Response(" ")
         else:
             return Response("카메라 세팅 다시 하세요")
-
-# 'apis/users/feedback - 자세한 피드백을 위해 유저 피드백 내용을 들고와 웹에 뿌려주는 API
-@api_view(['GET'])
-def getuserfeedback(request):
-    
-    if request.method == 'GET':
-        username = request.GET.get("username")
-    
-    '''
-    #장고 ORM에서 찾을때,
-    queryset = exercise_models.Motion.objects.filter(
-        exercise = exercise_modles.Exercise.objects.get(user = 1))
-    )
-    '''

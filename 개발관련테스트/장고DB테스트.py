@@ -1,6 +1,6 @@
 '''
 from users import models as user_models
-user = users_models.User.objects.get(username = username)
+user = user_models.User.objects.get(username = username)
 print(user)
 '''
 
