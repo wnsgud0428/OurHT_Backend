@@ -1,8 +1,5 @@
 from django.db import models
 
-import exercises
-
-
 class Exercise(models.Model):
     """Exercise Model Definition"""
 

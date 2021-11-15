@@ -9,9 +9,9 @@ class ExerciseSerializer(ModelSerializer):
 class MotionSerializer(ModelSerializer):
     class Meta:
         model = exercise_models.Motion
-        fields = ()
+        fields = '__all__'
 
 class ChecklistSerializer(ModelSerializer):
     class Meta:
         model = exercise_models.Checklist
-        fields = ()
+        fields = '__all__'

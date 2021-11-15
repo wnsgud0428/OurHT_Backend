@@ -1,5 +1,4 @@
-from typing import Tuple
-from django.db.models import query
+from django.db.models.fields import NullBooleanField
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -11,7 +10,7 @@ import base64
 from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
-
+from . import feedback
 # Create your views here.
 
 
@@ -65,136 +64,129 @@ def login(request):
     # Response 응답 고민!
     return Response("응답을 뭘 줄껀지도 고민")
 
+# 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
+@api_view(["POST"])
+def createexercise(request):
+    if request.method == 'POST':
+        userid = request.data["userid"]
+        exercise_type = request.data["type"]
+        create_exercise = exercise_models.Exercise.objects.create(user=userid, type=exercise_type)
+        return Response(create_exercise.pk)
+
+# 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함
+@api_view(["POST"])
+def createmotion(request):
+    if request.method == 'POST':
+        exercise_pk = request.data["exercisepk"]
+        count_number = request.data["countnumber"]
+        create_motion = exercise_models.Motion.objects.create(exercise=exercise_pk, count_number=count_number, checklist=None, photo=None)
+        return Response(create_motion.pk)
 
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])
 def getuserexercise(request):
     if request.method == 'GET':
         username = request.GET.get("username")
-        print(username)
         user = user_models.User.objects.get(username=username)
         if not user:
-            # 유저 존재안함! 요청 오류
-            pass
+            return Response("User Does Not Exist")
         else:
             queryset = exercise_models.Exercise.objects.get(user = user.id)
-            # 1개인 경우, 여러개인 경우 구분!
-            serializer = exercise_serializer.ExerciseSerializer(queryset, many=False)
-            print(serializer.data)
+            if len(queryset) >= 2:
+                serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
+            else:
+                serializer = exercise_serializer.ExerciseSerializer(queryset, many=False)
             return Response(serializer.data)
 
-# 'apis/users/getfeedback - 자세한 피드백을 위해 유저 피드백 내용을 들고와 웹에 뿌려주는 API
+# 'apis/users/getuserfeedback - 자세한 피드백을 위해 유저 피드백 내용(Motion 모델)을 들고와 웹에 뿌려주는 API
 @api_view(['GET'])
 def getuserfeedback(request):
     if request.method == 'GET':
         username = request.GET.get("username")
+        date = request.GET.get("date")
         user = user_models.User.objects.get(username = username)
         if not user:
-            # 찾고자 유저 없는 경우
-            pass
+            return Response("User Does Not Exist")
         else:
             # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
             queryset = exercise_models.Motion.objects.filter(
-            exercise = exercise_models.Exercise.objects.get(user = user.id))
-            serializer = exercise_serializer.MotionSerializer(queryset, many=True)
+            exercise = exercise_models.Exercise.objects.get(user = user.id, created=date))
+            if len(queryset) >= 2:
+                serializer = exercise_serializer.MotionSerializer(queryset, many=True)
+            else:
+                serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             return Response(serializer.data)
-    '''
-    #장고 ORM에서 찾을때,
-    queryset = exercise_models.Motion.objects.filter(
-        exercise = exercise_models.Exercise.objects.get(user = 1))
-    )
-    '''
 
-# 'apis/images' - 유저의 운동이미지를 받아와서 저장하는 함수
-@api_view(["GET", "POST"])
-def getimages(request):
-
+# 'apis/images/saveimages' - 유저의 운동이미지를 받아와서 저장하는 함수
+@api_view(["POST"])
+def saveimage(request):
     # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
     if request.method == "POST":
-        print("Images POST")
-        # POST로 온 데이터 받기
-        data = request.data
-        # data 앞에 쓸모없는 문자열 제거
-        replace_data = data.replace("data:image/jpeg;base64,", "")
-        # 이미지파일로 디코딩한후, 파일에 이미지 데이터 쓰기
-        imgdata = base64.b64decode(replace_data)
-        with open("media/test.jpg", "wb") as f:
-            f.write(imgdata)
+        exercise_pk = request.data["exercisepk"]
+        count_number = request.data["countnumber"]
+        image_url = request.data["url"]
+        image_data = image_url.replace("data:image/jpeg;base64,", "")
+        image_data = base64.b64decode(image_data)
 
-        # 데이터 여러개 받아오는 경우
-        """
-        data = request.data
-        # base64를 이미지로 바꾸는 과정, test.jpeg에 저장
-        imgdata = base64.b64decode(data["url"])
-        with open('test.jpeg', 'wb') as f:
-            f.write(imgdata)
-        """
-        # 이미지 모델 저장은 조금 더 고민..
-        # image = Image.objects.create(image_url = binary_data)
-        # serializer = ImageSerializer(image, many=False)
+        queryset = exercise_models.Motion.objects.filter(
+            exercise = exercise_models.Exercise.objects.get(pk = exercise_pk), count_number = count_number)
+        queryset.update(photo = image_data)
     return Response()
 
-# dynamic_data - 동적인 데이터 위해
-"""
-dynamic_data = []
-count = 0
-"""
+# 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 
 pose_list = []
 feedback_result = []
 is_person_gone_to_stand = "no"
 
-# 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 @api_view(["POST"])
 def getjointpoint(request):
 
     global is_person_gone_to_stand
 
-    # POST 요청 처리
     if request.method == "POST":
+        # 카메라 세팅 체크
         camSetFlag = isCameraSetted(request)
-
         if camSetFlag == True:
-            data = request.data
+            data = request.data["skeletonpoint"]
+            # 현재 스쿼트 상태 체크
             squat_state = returnSquatState(data)
-
+            # 스쿼트 상태인 경우
             if squat_state == "squat":
                 pose_list.append(data)
                 is_person_gone_to_stand = "no"
             else:
                 if squat_state == "stand":
                     is_person_gone_to_stand = "yes"
-
+                # 스쿼트를 한번 한 후, 다시 일어난 경우
                 if is_person_gone_to_stand == "yes":
-                    # pose_list 처리 하는 부분
+                    # 스쿼트 사진 중에서, 가장 제대로 앉은 사진 샘플링하기
                     pose_list_for_hip_y = []
                     for p in pose_list:
                         pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
-                    # print(pose_list_for_hip_y)
                     if pose_list_for_hip_y:
                         max_hip_y = max(pose_list_for_hip_y)
-
                         # 샘플링 할 사진 index 찾기
                         for i in range(len(pose_list_for_hip_y)):
                             if max_hip_y == pose_list_for_hip_y[i]:
                                 max_hip_y_index = i
 
-                        #print(f"hip_y의 리스트:{pose_list_for_hip_y}")
-                        #print(f"max_hip_y 값:{max_hip_y}")
-
-                        # 샘플링 사진으로 피드백 함수 돌리기
+                        # 샘플링한 사진으로 피드백 함수 돌리기
                         data = pose_list[max_hip_y_index]
                         feedback_result.append(isUpperbodyNotBent(request))
                         feedback_result.append(isFaceForward(request))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
                         feedback_result.append(feedback.checkRangeofmotion(data))
                         feedback_result.append(feedback.checkKneeposition(data))
                         feedback_result.append(feedback.checkCenterofgravity(data))
-                        # OpenCV 등 피드백 함수 추가
+                        #feedback_result.append(feedback.checkbackline(data, image))
 
-                        # DB에 결과 저장 및 변수 초기화
-                        # 모델 완성되는대로 추가해야함!
+                        # DB에 결과 저장
                         # ~.objects.create(### = feedback_result[i])
-                        pose_models.Pose.objects.create(hip_y=max_hip_y)
+                        exercise_pk = request.data["exercisepk"]
+                        count_number = request.data["countnumber"]
+                        create_motion = exercise_models.Motion.objects.create(exercise=exercise_pk, count_number=count_number, checklist=None, photo=None)
+
+                        # 변수 초기화
                         pose_list_for_hip_y.clear()
                         pose_list.clear()
 

@@ -6,10 +6,12 @@ urlpatterns = [
 
     # User 관련 API
     path('users/login', views.login, name="login"),
-    path('users/getexercise', views.getuserexercise, name="getuserexercise"),
-    path('users/getfeedback', views.getuserfeedback, name="userfeedback"),
+    path('users/createexercise', views.createexercise, name="createexercise"),
+    path('users/createmotion', views.createmotion, name="createmotion"),
+    path('users/getuserexercise', views.getuserexercise, name="getuserexercise"),
+    path('users/getuserfeedback', views.getuserfeedback, name="getuserfeedback"),
 
     # Image 관련 API
-    path('images/', views.getimages, name="getimages"),
+    path('images/saveimage', views.saveimage, name="saveimage"),
     path('images/getjointpoint', views.getjointpoint, name='getjointpoint'),
 ]

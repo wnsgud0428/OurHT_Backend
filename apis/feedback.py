@@ -169,5 +169,9 @@ def checkbackline(data, image):
     print(max(distance), min(distance))
     # 1. 거리 데이터를 통해 굽었는지 판정하기
     diff = max(distance) - min(distance)
-    
-    # 2. 곡률 데이터를 통해 굽었는지 판정하기
+    if diff > 30:
+        return False
+    else:
+        return True
+
+    # 2. 곡률 데이터를 통해 굽었는지 판정하기 - 곡률이 제대로 측정되지 않아서 보류
