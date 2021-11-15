@@ -4,7 +4,7 @@ from exercises import models as exercise_models
 class ExerciseSerializer(ModelSerializer):
     class Meta:
         model = exercise_models.Exercise
-        fields = ()
+        fields = '__all__'
 
 class MotionSerializer(ModelSerializer):
     class Meta:

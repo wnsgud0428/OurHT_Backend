@@ -1,3 +1,5 @@
+from typing import Tuple
+from django.db.models import query
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -64,18 +66,21 @@ def login(request):
     return Response("응답을 뭘 줄껀지도 고민")
 
 
-# 'apis/users/getexercise' - 유저 정보를 웹에 전달해주는 함수
+# 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])
 def getuserexercise(request):
     if request.method == 'GET':
         username = request.GET.get("username")
+        print(username)
         user = user_models.User.objects.get(username=username)
         if not user:
             # 유저 존재안함! 요청 오류
             pass
         else:
             queryset = exercise_models.Exercise.objects.get(user = user.id)
-            serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
+            # 1개인 경우, 여러개인 경우 구분!
+            serializer = exercise_serializer.ExerciseSerializer(queryset, many=False)
+            print(serializer.data)
             return Response(serializer.data)
 
 # 'apis/users/getfeedback - 자세한 피드백을 위해 유저 피드백 내용을 들고와 웹에 뿌려주는 API
