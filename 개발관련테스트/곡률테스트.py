@@ -1,9 +1,5 @@
-# 잡다하게 필요한 것 같은 함수들
-# 모두 수학적인 좌표 기준으로 작성
-# 함수에 매개변수 넣을 때, 수학적인 좌표 기준으로 넣어야함!
-
-import numpy as np
-import math, cv2
+import matplotlib.pyplot as plt
+import math, cv2, numpy as np
 
 # 임의의 두 점이 주어질 때, 직선의 기울기 찾기
 def find_straightslope(first_x, first_y, second_x, second_y):
@@ -79,19 +75,64 @@ def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
         coor_result.append([new_x, new_y])
 
     return distance_result, coor_result
+    
 
-# 세 점이 있을 때, 각도 찾기, b가 끼인 점
-def calculate_angle(a, b, c):
+testimage = cv2.imread("testimage2.png", 1)
+testimage = np.array(testimage)
+print(testimage.shape[0])
+# print(testimage[341 - 94 - 1][500])
 
-    a = np.array(a)  # First
-    b = np.array(b)  # Mid
-    c = np.array(c)  # End
+length_y = testimage.shape[0]
+# testimage
+'''
+test_slope = find_straightslope(261, length_y - 103, 364, length_y - 160)
+dist_arr, coor_arr = find_distancefromboarderline(testimage, test_slope, 261, length_y - 103, 364)
+'''
+# testimage2
+test_slope = find_straightslope(194, length_y - 157, 413, length_y - 131)
+dist_arr, coor_arr = find_distancefromboarderline(testimage, test_slope, 194, length_y - 157, 413)
+plt.scatter(list(zip(*dist_arr))[0], list(zip(*dist_arr))[1], 1)
+plt.scatter(list(zip(*coor_arr))[0], list(zip(*coor_arr))[1])
+plt.show()
 
-    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
+# 곡률 찾는 함수, 정확도가 부정확한 것 같음
+def find_curvature(coordinate_array):
+    #x_t = np.gradient(list(zip(*coordinate_array))[0])
+    #y_t = np.gradient(list(zip(*coordinate_array))[1])
 
-    angle = np.abs(radians * 180.0 / np.pi)
+    x_t = np.gradient(coordinate_array[:, 0])
+    y_t = np.gradient(coordinate_array[:, 1])
 
-    if angle > 180.0:
-        angle = 360 - angle
+    vel = np.array([ [x_t[i], y_t[i]] for i in range(x_t.size)])
+    speed = np.sqrt(x_t * x_t + y_t * y_t)
+    tangent = np.array([1/speed] * 2).transpose() * vel
+    '''
+    tangent_x = tangent[:, 0]
+    tangent_y = tangent[:, 1]
+    deriv_tangent_x = np.gradient(tangent_x)
+    deriv_tangent_y = np.gradient(tangent_y)
+    dT_dt = np.array([ [deriv_tangent_x[i], deriv_tangent_y[i]] for i in range(deriv_tangent_x.size)])
+    length_dT_dt = np.sqrt(deriv_tangent_x * deriv_tangent_x + deriv_tangent_y * deriv_tangent_y)
+    normal = np.array([1/length_dT_dt] * 2).transpose() * dT_dt
+    '''
 
-    return angle
+    ss_t = np.gradient(speed)
+    xx_t = np.gradient(x_t)
+    yy_t = np.gradient(y_t)
+
+    curvature_val = np.abs(xx_t * y_t - x_t * yy_t) / (x_t * x_t + y_t * y_t)**1.5
+    '''
+    t_component = np.array([ss_t] * 2).transpose()
+    n_component = np.array([curvature_val * speed * speed] * 2).transpose()
+    acceleration = t_component * tangent + n_component * normal
+    '''
+    x_ayis = []
+    for i in range(len(curvature_val)):
+        x_ayis.append(i + 1)
+    print(x_ayis)
+    plt.scatter(x_ayis, curvature_val)
+    plt.show()
+    print(curvature_val)
+
+coor_arr = np.array(coor_arr)
+find_curvature(coor_arr)

@@ -141,33 +141,30 @@ count = 0
 """
 
 pose_list = []
+feedback_result = []
 is_person_gone_to_stand = "no"
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 @api_view(["POST"])
 def getjointpoint(request):
+
     global is_person_gone_to_stand
+
     # POST 요청 처리
     if request.method == "POST":
-        # 준형
         camSetFlag = isCameraSetted(request)
-        # isUpperbodyNotBent(request)  # 테스트 완료
-        # isFaceForward(request)  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
-
-        # 병주
-        data = request.data
-        # RangeofmotionFlag = feedback.checkRangeofmotion(data) #잘됨
-        # KneepositionFlag = feedback.checkKneeposition(data) #잘됨
-        # CenterofgraityFlag = feedback.checkCenterofgravity(data) #잘됨
 
         if camSetFlag == True:
+            data = request.data
             squat_state = returnSquatState(data)
+
             if squat_state == "squat":
                 pose_list.append(data)
                 is_person_gone_to_stand = "no"
             else:
                 if squat_state == "stand":
                     is_person_gone_to_stand = "yes"
+
                 if is_person_gone_to_stand == "yes":
                     # pose_list 처리 하는 부분
                     pose_list_for_hip_y = []
@@ -176,15 +173,44 @@ def getjointpoint(request):
                     # print(pose_list_for_hip_y)
                     if pose_list_for_hip_y:
                         max_hip_y = max(pose_list_for_hip_y)
-                        print(f"hip_y의 리스트:{pose_list_for_hip_y}")
-                        print(f"max_hip_y 값:{max_hip_y}")
+
+                        # 샘플링 할 사진 index 찾기
+                        for i in range(len(pose_list_for_hip_y)):
+                            if max_hip_y == pose_list_for_hip_y[i]:
+                                max_hip_y_index = i
+
+                        #print(f"hip_y의 리스트:{pose_list_for_hip_y}")
+                        #print(f"max_hip_y 값:{max_hip_y}")
+
+                        # 샘플링 사진으로 피드백 함수 돌리기
+                        data = pose_list[max_hip_y_index]
+                        feedback_result.append(isUpperbodyNotBent(request))
+                        feedback_result.append(isFaceForward(request))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+                        feedback_result.append(feedback.checkRangeofmotion(data))
+                        feedback_result.append(feedback.checkKneeposition(data))
+                        feedback_result.append(feedback.checkCenterofgravity(data))
+                        # OpenCV 등 피드백 함수 추가
+
+                        # DB에 결과 저장 및 변수 초기화
+                        # 모델 완성되는대로 추가해야함!
+                        # ~.objects.create(### = feedback_result[i])
                         pose_models.Pose.objects.create(hip_y=max_hip_y)
                         pose_list_for_hip_y.clear()
                         pose_list.clear()
+
+                        # 실시간 피드백을 위한 응답 
+                        feedback_true_count = 0
+                        for f in feedback_result:
+                            if f == "True":
+                                feedback_true_count += 1
+                        
+                        if feedback_true_count >= 5:
+                            return Response("Perfect")
+                        elif feedback_true_count <= 1:
+                            return Response("Bad")
+                        else:
+                            return Response("Good")
                 else:
                     pass
-
-        if camSetFlag == True:
-            return Response(" ")
         else:
             return Response("카메라 세팅 다시 하세요")

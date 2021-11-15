@@ -72,7 +72,7 @@ def find_boarderlinepoint(picture, slope, start_x, start_y, end_x):
 
     return result
 
-testimage = cv2.imread("testimage.png", cv2.IMREAD_COLOR)
+testimage = cv2.imread("testimage.png", 1)
 testpic = np.array(testimage)
 print(testpic)
 cv2.imshow("Hello", testimage)

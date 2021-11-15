@@ -1,4 +1,4 @@
-import util, numpy
+import util, numpy as np, cv2
 
 
 def checkRangeofmotion(data):
@@ -32,12 +32,16 @@ def checkRangeofmotion(data):
     # print(between_degree)
 
     # 최종 자세판단
-    if numpy.abs(waist_to_knee_slope) < 5:
+    if np.abs(waist_to_knee_slope) < 5:
         if between_degree > 50 and between_degree < 90:
             print("1-2: 가동범위 굿")
-            return True
+            return 3
+        else:
+            return 2
+    elif np.abs(waist_to_knee_slope) > 5 and np.abs(waist_to_knee_slope) < 50:
+        return 2
     else:
-        return False
+        return 1
 
 
 def checkKneeposition(data):
@@ -133,9 +137,37 @@ def checkCenterofgravity(data):
             return False
 
     # 어깨와 발목이 비슷한 좌표 포인트에서 움직이는지 판단!
-    diff = numpy.abs(shoulder[0] - ankle[0])
+    diff = np.abs(shoulder[0] - ankle[0])
     if diff < 50:
         print("2-2: 무게중심 적절함")
         return True
     else:
         return False
+
+def checkbackline(data, image):
+    # 관절 좌표 처리
+    left_shoulder = data["keypoints"][5]["position"]
+    right_shoulder = data["keypoints"][6]["position"]
+    left_waist = data["keypoints"][11]["position"]
+    right_waist = data["keypoints"][12]["position"]
+
+    # 관절 좌, 우 중심점 찾기
+    shoulder = [
+        (left_shoulder["x"] + right_shoulder["x"]) / 2,
+        (left_shoulder["y"] + right_shoulder["y"]) / 2,
+    ]
+    waist = [
+        (left_waist["x"] + right_waist["x"]) / 2,
+        (left_waist["y"] + right_waist["y"]) / 2,
+    ]
+
+    # 이미지와 관절 좌표 이용하여, 등 경계선과의 거리 측정하기
+    image = np.array(image)
+    slope = util.find_straightslope(shoulder[0], shoulder[1], waist[0], waist[1])
+    distance, coordinate = util.find_distancefromboarderline(image, slope, shoulder[0], shoulder[1], waist[0])
+
+    print(max(distance), min(distance))
+    # 1. 거리 데이터를 통해 굽었는지 판정하기
+    diff = max(distance) - min(distance)
+    
+    # 2. 곡률 데이터를 통해 굽었는지 판정하기
