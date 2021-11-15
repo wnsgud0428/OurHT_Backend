@@ -1,4 +1,5 @@
 from django.db.models.fields import NullBooleanField
+import numpy
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -73,7 +74,7 @@ def createexercise(request):
         create_exercise = exercise_models.Exercise.objects.create(user=userid, type=exercise_type)
         return Response(create_exercise.pk)
 
-# 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함
+# 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함 // 필요 없을 듯?
 @api_view(["POST"])
 def createmotion(request):
     if request.method == 'POST':
@@ -91,7 +92,7 @@ def getuserexercise(request):
         if not user:
             return Response("User Does Not Exist")
         else:
-            queryset = exercise_models.Exercise.objects.get(user = user.id)
+            queryset = exercise_models.Exercise.objects.get(user = user[0].id)
             if len(queryset) >= 2:
                 serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
             else:
@@ -104,7 +105,9 @@ def getuserfeedback(request):
     if request.method == 'GET':
         username = request.GET.get("username")
         date = request.GET.get("date")
+        print(date)
         user = user_models.User.objects.get(username = username)
+        print(user)
         if not user:
             return Response("User Does Not Exist")
         else:
@@ -171,6 +174,11 @@ def getjointpoint(request):
                             if max_hip_y == pose_list_for_hip_y[i]:
                                 max_hip_y_index = i
 
+                        image_url = request.data["url"]
+                        image_data = image_url.replace("data:image/jpeg;base64,", "")
+                        image_arr = base64.b64decode(image_data)
+                        image_arr = numpy.array(image_arr)
+
                         # 샘플링한 사진으로 피드백 함수 돌리기
                         data = pose_list[max_hip_y_index]
                         feedback_result.append(isUpperbodyNotBent(request))
@@ -178,13 +186,17 @@ def getjointpoint(request):
                         feedback_result.append(feedback.checkRangeofmotion(data))
                         feedback_result.append(feedback.checkKneeposition(data))
                         feedback_result.append(feedback.checkCenterofgravity(data))
-                        #feedback_result.append(feedback.checkbackline(data, image))
+                        feedback_result.append(feedback.checkbackline(data, image_arr))
 
                         # DB에 결과 저장
-                        # ~.objects.create(### = feedback_result[i])
                         exercise_pk = request.data["exercisepk"]
                         count_number = request.data["countnumber"]
-                        create_motion = exercise_models.Motion.objects.create(exercise=exercise_pk, count_number=count_number, checklist=None, photo=None)
+                        exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+                        create_motion = exercise_models.Motion.objects.create(exercise=exercise, count_number=count_number, photo=image_data)
+                        # 생성한 Motion 모델에 피드백 결과 checklist 넣기
+                        for i in range(len(feedback_result)):
+                            if feedback_result[i] == "True":
+                                create_motion.checklist.add(exercise_models.Checklist.objects.get(pk = i))
 
                         # 변수 초기화
                         pose_list_for_hip_y.clear()
