@@ -92,7 +92,7 @@ def getuserexercise(request):
         if not user:
             return Response("User Does Not Exist")
         else:
-            queryset = exercise_models.Exercise.objects.get(user = user[0].id)
+            queryset = exercise_models.Exercise.objects.get(user = user.id)
             if len(queryset) >= 2:
                 serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
             else:
@@ -187,6 +187,7 @@ def getjointpoint(request):
                         feedback_result.append(feedback.checkKneeposition(data))
                         feedback_result.append(feedback.checkCenterofgravity(data))
                         feedback_result.append(feedback.checkbackline(data, image_arr))
+                        print("피드백 결과 : ", feedback_result)
 
                         # DB에 결과 저장
                         exercise_pk = request.data["exercisepk"]

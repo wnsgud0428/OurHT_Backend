@@ -1,3 +1,4 @@
+from rest_framework.fields import flatten_choices_dict
 import util, numpy as np, cv2
 
 
@@ -32,6 +33,7 @@ def checkRangeofmotion(data):
     # print(between_degree)
 
     # 최종 자세판단
+    '''
     if np.abs(waist_to_knee_slope) < 5:
         if between_degree > 50 and between_degree < 90:
             print("1-2: 가동범위 굿")
@@ -42,6 +44,17 @@ def checkRangeofmotion(data):
         return 2
     else:
         return 1
+        '''
+    if np.abs(waist_to_knee_slope) < 5:
+        if between_degree > 50 and between_degree < 90:
+            print("1-2: 가동범위 굿")
+            return True
+        else:
+            return False
+    elif np.abs(waist_to_knee_slope) > 5 and np.abs(waist_to_knee_slope) < 50:
+        return False
+    else:
+        return False
 
 
 def checkKneeposition(data):
@@ -164,10 +177,12 @@ def checkbackline(data, image):
     # 이미지와 관절 좌표 이용하여, 등 경계선과의 거리 측정하기
     image = np.array(image)
     slope = util.find_straightslope(shoulder[0], shoulder[1], waist[0], waist[1])
-    distance, coordinate = util.find_distancefromboarderline(image, slope, shoulder[0], shoulder[1], waist[0])
+    if shoulder[0] < waist[0]:
+        distance, coordinate = util.find_distancefromboarderline(image, slope, shoulder[0], shoulder[1], waist[0])
+    else:
+        distance, coordinate = util.find_distancefromboarderline(image, slope, waist[0], waist[1], shoulder[0])
 
-    print(max(distance), min(distance))
-    # 1. 거리 데이터를 통해 굽었는지 판정하기
+    print("거리의 최대 차이 : ", max(distance), min(distance))
     diff = max(distance) - min(distance)
     if diff > 30:
         return False
