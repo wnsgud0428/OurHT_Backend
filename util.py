@@ -43,7 +43,6 @@ def find_distancefromline(slope, line_x, line_y, point_x, point_y):
 # 한 직선이 주어지고, 그 직선에 수직인 직선을 따라가면서 그림의 경계점까지의 거리 찾기
 # start_x < end_x 여야함!
 def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
-
     # 그림의 가로, 세로 크기
     len_y = picture.shape[0]  # 세로
     len_x = picture.shape[1]  # 가로
@@ -75,10 +74,10 @@ def find_distancefromboarderline(picture, slope, start_x, start_y, end_x):
             if (new_x >= len_x) or (new_x < 0) or (new_y >= len_y) or (new_y < 0):
                 break
 
-        distance_result.append([i,math.sqrt((i - new_x) * (i - new_x) + (basic_line[0] * i + basic_line[1] - new_y) * (basic_line[0] * i + basic_line[1] - new_y))])
+        distance_result.append(math.sqrt((i - new_x) * (i - new_x) + (basic_line[0] * i + basic_line[1] - new_y) * (basic_line[0] * i + basic_line[1] - new_y)))
         coor_result.append([new_x, new_y])
 
-    return distance_result, coor_result
+    return distance_result
 
 # 세 점이 있을 때, 각도 찾기, b가 끼인 점
 def calculate_angle(a, b, c):

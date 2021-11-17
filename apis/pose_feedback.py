@@ -46,20 +46,20 @@ def calculate_angle(a, b, c):
     return angle
 
 
-def isUpperbodyNotBent(request):
+def isUpperbodyNotBent(data):
     is_upperbody_not_bent = False
 
-    left_shoulder_x = request.data["keypoints"][5]["position"]["x"]
-    left_shoulder_y = request.data["keypoints"][5]["position"]["y"]
+    left_shoulder_x = data["keypoints"][5]["position"]["x"]
+    left_shoulder_y = data["keypoints"][5]["position"]["y"]
 
-    left_hip_x = request.data["keypoints"][11]["position"]["x"]
-    left_hip_y = request.data["keypoints"][11]["position"]["y"]
+    left_hip_x = data["keypoints"][11]["position"]["x"]
+    left_hip_y = data["keypoints"][11]["position"]["y"]
 
-    left_knee_x = request.data["keypoints"][13]["position"]["x"]
-    left_knee_y = request.data["keypoints"][13]["position"]["y"]
+    left_knee_x = data["keypoints"][13]["position"]["x"]
+    left_knee_y = data["keypoints"][13]["position"]["y"]
 
-    left_ankle_x = request.data["keypoints"][15]["position"]["x"]
-    left_ankle_y = request.data["keypoints"][15]["position"]["y"]
+    left_ankle_x = data["keypoints"][15]["position"]["x"]
+    left_ankle_y = data["keypoints"][15]["position"]["y"]
 
     left_shoulder = [left_shoulder_x, left_shoulder_y]
     left_hip = [left_hip_x, left_hip_y]
@@ -90,17 +90,17 @@ def isUpperbodyNotBent(request):
 
 
 # 눈-귀-어깨 각도 비교
-def isFaceForward(request):
+def isFaceForward(data):
     is_face_forward = False
 
-    left_eye_x = request.data["keypoints"][1]["position"]["x"]
-    left_eye_y = request.data["keypoints"][1]["position"]["y"]
+    left_eye_x = data["keypoints"][1]["position"]["x"]
+    left_eye_y = data["keypoints"][1]["position"]["y"]
 
-    left_ear_x = request.data["keypoints"][3]["position"]["x"]
-    left_ear_y = request.data["keypoints"][3]["position"]["y"]
+    left_ear_x = data["keypoints"][3]["position"]["x"]
+    left_ear_y = data["keypoints"][3]["position"]["y"]
 
-    left_shoulder_x = request.data["keypoints"][5]["position"]["x"]
-    left_shoulder_y = request.data["keypoints"][5]["position"]["y"]
+    left_shoulder_x = data["keypoints"][5]["position"]["x"]
+    left_shoulder_y = data["keypoints"][5]["position"]["y"]
 
     left_eye = [left_eye_x, left_eye_y]
     left_ear = [left_ear_x, left_ear_y]

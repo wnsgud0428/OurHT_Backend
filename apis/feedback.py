@@ -175,16 +175,15 @@ def checkbackline(data, image):
     ]
 
     # 이미지와 관절 좌표 이용하여, 등 경계선과의 거리 측정하기
-    image = np.array(image)
     slope = util.find_straightslope(shoulder[0], shoulder[1], waist[0], waist[1])
     if shoulder[0] < waist[0]:
-        distance, coordinate = util.find_distancefromboarderline(image, slope, shoulder[0], shoulder[1], waist[0])
+        distance = util.find_distancefromboarderline(image, slope, int(shoulder[0]), int(shoulder[1]), int(waist[0]))
     else:
-        distance, coordinate = util.find_distancefromboarderline(image, slope, waist[0], waist[1], shoulder[0])
+        distance = util.find_distancefromboarderline(image, slope, int(waist[0]), int(waist[1]), int(shoulder[0]))
 
     print("거리의 최대 차이 : ", max(distance), min(distance))
     diff = max(distance) - min(distance)
-    if diff > 30:
+    if diff > 50:
         return False
     else:
         return True

@@ -1,5 +1,7 @@
+import cv2
 from django.db.models.fields import NullBooleanField
 import numpy
+from numpy.lib.type_check import imag
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -141,17 +143,17 @@ def saveimage(request):
 pose_list = []
 feedback_result = []
 is_person_gone_to_stand = "no"
+count = 1
 
 @api_view(["POST"])
 def getjointpoint(request):
 
-    global is_person_gone_to_stand
-
+    global is_person_gone_to_stand, count
+    data = request.data["skeletonpoint"]
     if request.method == "POST":
         # 카메라 세팅 체크
-        camSetFlag = isCameraSetted(request)
+        camSetFlag = isCameraSetted(data)
         if camSetFlag == True:
-            data = request.data["skeletonpoint"]
             # 현재 스쿼트 상태 체크
             squat_state = returnSquatState(data)
             # 스쿼트 상태인 경우
@@ -169,46 +171,52 @@ def getjointpoint(request):
                         pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
                     if pose_list_for_hip_y:
                         max_hip_y = max(pose_list_for_hip_y)
-                        # 샘플링 할 사진 index 찾기
+                        # 샘플링 할 사진 index 찾기, 이미지 url도 저장하기
                         for i in range(len(pose_list_for_hip_y)):
                             if max_hip_y == pose_list_for_hip_y[i]:
                                 max_hip_y_index = i
 
                         image_url = request.data["url"]
-                        image_data = image_url.replace("data:image/jpeg;base64,", "")
+                        image_data = image_url.replace("data:image/webp;base64,", "")
                         image_arr = base64.b64decode(image_data)
-                        image_arr = numpy.array(image_arr)
+                        with open('test.jpeg', 'wb') as f:
+                            f.write(image_arr)
+                        f.close()
 
+                        image_arr = cv2.imread('test.jpeg', 1)
+                        image_arr = numpy.array(image_arr)
                         # 샘플링한 사진으로 피드백 함수 돌리기
                         data = pose_list[max_hip_y_index]
-                        feedback_result.append(isUpperbodyNotBent(request))
-                        feedback_result.append(isFaceForward(request))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+                        feedback_result.append(isUpperbodyNotBent(data))
+                        feedback_result.append(isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
                         feedback_result.append(feedback.checkRangeofmotion(data))
                         feedback_result.append(feedback.checkKneeposition(data))
-                        feedback_result.append(feedback.checkCenterofgravity(data))
-                        feedback_result.append(feedback.checkbackline(data, image_arr))
+                        feedback_result.append(feedback.checkCenterofgravity(data)) # 무게중심 깐깐함
+                        #feedback_result.append(feedback.checkbackline(data, image_arr))
                         print("피드백 결과 : ", feedback_result)
 
                         # DB에 결과 저장
-                        exercise_pk = request.data["exercisepk"]
-                        count_number = request.data["countnumber"]
-                        exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
-                        create_motion = exercise_models.Motion.objects.create(exercise=exercise, count_number=count_number, photo=image_data)
+                        #exercise_pk = request.data["exercisepk"]
+                        exercise = exercise_models.Exercise.objects.get(pk = 1)
+                        create_motion = exercise_models.Motion.objects.create(exercise=exercise, count_number=count, photo=image_data)
                         # 생성한 Motion 모델에 피드백 결과 checklist 넣기
                         for i in range(len(feedback_result)):
                             if feedback_result[i] == "True":
                                 create_motion.checklist.add(exercise_models.Checklist.objects.get(pk = i))
 
-                        # 변수 초기화
-                        pose_list_for_hip_y.clear()
-                        pose_list.clear()
-
                         # 실시간 피드백을 위한 응답 
                         feedback_true_count = 0
                         for f in feedback_result:
-                            if f == "True":
+                            if f == True:
                                 feedback_true_count += 1
                         
+                        # 변수 초기화
+                        pose_list_for_hip_y.clear()
+                        pose_list.clear()
+                        feedback_result.clear()
+                        count += 1
+
+                        print("결과 : ", count, feedback_true_count)
                         if feedback_true_count >= 5:
                             return Response("Perfect")
                         elif feedback_true_count <= 1:
@@ -217,5 +225,6 @@ def getjointpoint(request):
                             return Response("Good")
                 else:
                     pass
+            return Response("운동 진행 중")
         else:
             return Response("카메라 세팅 다시 하세요")

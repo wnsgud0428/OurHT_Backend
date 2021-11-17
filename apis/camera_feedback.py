@@ -1,4 +1,4 @@
-def isCameraSetted(request):
+def isCameraSetted(data):
     camera_width = 640
     mid = camera_width / 2
     # 각 조건을 만족하는지 검사하기 위함
@@ -6,8 +6,8 @@ def isCameraSetted(request):
     is_ankle_mid = False
     is_shoulder_sideview = False
 
-    left_ankle_x = request.data["keypoints"][15]["position"]["x"]
-    left_ankle_y = request.data["keypoints"][15]["position"]["y"]
+    left_ankle_x = data["keypoints"][15]["position"]["x"]
+    left_ankle_y = data["keypoints"][15]["position"]["y"]
 
     ### 발목 보이는거를 위해
     below_ankle = 480 - left_ankle_y
@@ -28,8 +28,8 @@ def isCameraSetted(request):
         is_ankle_mid = False
         # print("발목이 중앙에 오도록 하세요!")
 
-    left_shoulder_x = request.data["keypoints"][5]["position"]["x"]
-    right_shoulder_x = request.data["keypoints"][6]["position"]["x"]
+    left_shoulder_x = data["keypoints"][5]["position"]["x"]
+    right_shoulder_x = data["keypoints"][6]["position"]["x"]
     mis_align = abs(left_shoulder_x - right_shoulder_x)
 
     ### 어깨의 측면view 정렬을 위해
