@@ -105,19 +105,19 @@ def getuserfeedback(request):
     if request.method == 'GET':
         username = request.GET.get("username")
         date = request.GET.get("date")
-        print(date)
         user = user_models.User.objects.get(username = username)
-        print(user)
         if not user:
             return Response("User Does Not Exist")
         else:
             # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
             queryset = exercise_models.Motion.objects.filter(
             exercise = exercise_models.Exercise.objects.get(user = user.id, created=date))
+
             if len(queryset) >= 2:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
+            print(serializer.data)
             return Response(serializer.data)
 
 # 'apis/images/saveimages' - 유저의 운동이미지를 받아와서 저장하는 함수

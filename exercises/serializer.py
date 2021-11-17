@@ -1,4 +1,8 @@
+from django.db.models.fields import CharField
+from numpy.lib.utils import source
 from rest_framework.serializers import ModelSerializer
+from apis import serializer
+from apis.feedback import checkKneeposition
 from exercises import models as exercise_models
 
 class ExerciseSerializer(ModelSerializer):
@@ -6,12 +10,16 @@ class ExerciseSerializer(ModelSerializer):
         model = exercise_models.Exercise
         fields = '__all__'
 
+class ChecklistSerializer(ModelSerializer):
+    print("Checklist")
+    class Meta:
+        model = exercise_models.Checklist
+        fields = '__all__'
+
 class MotionSerializer(ModelSerializer):
+    print("Motion")
+    checklist = ChecklistSerializer(read_only=True, many=True)
     class Meta:
         model = exercise_models.Motion
         fields = '__all__'
 
-class ChecklistSerializer(ModelSerializer):
-    class Meta:
-        model = exercise_models.Checklist
-        fields = '__all__'
