@@ -36,7 +36,7 @@ class Motion(models.Model):
     checklist = models.ManyToManyField(
         "Checklist", related_name="exercises", blank=True
     )
-    photo = models.ImageField(null=True)
+    photo = models.ImageField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.exercise} - {self.count_number}"

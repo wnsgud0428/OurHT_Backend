@@ -9,8 +9,42 @@ from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
 from pose import models as pose_models
+from exercises import models as exercise_models
 
-# Create your views here.
+# 로그인 인증을 위해
+from rest_framework import viewsets
+from users.models import User
+from .serializer import UserSerializer, MotionSerializer
+from django.contrib.auth import authenticate
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+###
+from rest_framework.views import APIView
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class MotionViewSet(viewsets.ModelViewSet):
+    queryset = exercise_models.Motion.objects.all()
+    serializer_class = MotionSerializer
+    authentication_classes = [
+        TokenAuthentication,
+    ]
+    permission_classes = [
+        IsAuthenticated,
+    ]
+
+
+class ExerciseList(APIView):
+    def get(self, request):
+        print(request)
+        print(request.user)
+        serializer = serializer.ExerciseSerializer
+        return Response(serializer.data)
 
 
 @api_view(["GET"])

@@ -44,6 +44,7 @@ THIRD_PARTY_APPS = [
     # For rest Framework
     "rest_framework",
     "corsheaders",
+    "rest_framework.authtoken",  # 로그인을 위해
 ]
 
 PROJECT_APPS = [
@@ -52,6 +53,12 @@ PROJECT_APPS = [
     "users.apps.UsersConfig",
     "exercises.apps.ExercisesConfig",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ]
+}
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS
 

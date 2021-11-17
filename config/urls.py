@@ -18,8 +18,13 @@ from django.urls import path
 from django.urls.conf import include
 from django.views.generic import TemplateView
 
+###로그인을 위해
+from rest_framework.authtoken.views import obtain_auth_token
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", TemplateView.as_view(template_name="index.html")),
     path("apis/", include("apis.urls")),
+    path("auth/", obtain_auth_token),  # 로그인을 위해
 ]
