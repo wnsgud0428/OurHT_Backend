@@ -9,8 +9,14 @@ def isCameraSetted(data):
     left_ankle_x = data["keypoints"][15]["position"]["x"]
     left_ankle_y = data["keypoints"][15]["position"]["y"]
 
+    right_ankle_x = data["keypoints"][16]["position"]["x"]
+    right_ankle_y = data["keypoints"][16]["position"]["y"]
+
+    ankle_x = (left_ankle_x + right_ankle_x) / 2
+    ankle_y = (left_ankle_y + right_ankle_y) / 2
+
     ### 발목 보이는거를 위해
-    below_ankle = 480 - left_ankle_y
+    below_ankle = 480 - ankle_y
     # print(f"발목 아래 공간:{below_ankle}")
     if below_ankle > 30:
         is_ankle_show = True
@@ -21,7 +27,7 @@ def isCameraSetted(data):
 
     ### 발목의 중앙 정렬을 위해 --> 정확도 향상을 하려면 left_ankle뿐만 아니라 right_ankle도 고려해야됨
     # print(f"발목 x좌표:{left_ankle_x}")
-    if mid - 100 < left_ankle_x < mid + 100:  #
+    if mid - 100 < ankle_x < mid + 100:  #
         is_ankle_mid = True
         # print("1-1-2: 중앙정렬 완료")
     else:
@@ -34,14 +40,14 @@ def isCameraSetted(data):
 
     ### 어깨의 측면view 정렬을 위해
     # print(mis_align)
-    if mis_align < 20:
+    if mis_align < 50:
         is_shoulder_sideview = True
         # print("1-1-3: 측면으로 잘 섰습니다")
     else:
         is_shoulder_sideview = False
         # print("몸을 틀어, 측면이 잘 보이도록 조정해주세요!")
 
-    if is_ankle_mid == True:
+    if is_ankle_mid and is_shoulder_sideview == True:
         print("1-1: 카메라 세팅 완료")
         return True
     else:

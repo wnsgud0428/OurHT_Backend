@@ -11,9 +11,11 @@ from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
 from . import feedback
+
 # Create your views here.
 
 count = 1
+
 
 @api_view(["GET"])
 # 주석 달기
@@ -65,68 +67,80 @@ def login(request):
     # Response 응답 고민!
     return Response("응답을 뭘 줄껀지도 고민")
 
+
 # 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
 @api_view(["POST"])
 def createexercise(request):
-    if request.method == 'POST':
-        #userid = request.data["userid"]
-        user = user_models.User.objects.get(id = 1)
+    if request.method == "POST":
+        # userid = request.data["userid"]
+        user = user_models.User.objects.get(id=1)
         create_exercise = exercise_models.Exercise.objects.create(user=user, type=1)
         return Response(create_exercise.pk)
+
 
 # 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함 // 필요 없을 듯?
 @api_view(["POST"])
 def createmotion(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         exercise_pk = request.data["exercisepk"]
         count_number = request.data["countnumber"]
-        create_motion = exercise_models.Motion.objects.create(exercise=exercise_pk, count_number=count_number, checklist=None, photo=None)
+        create_motion = exercise_models.Motion.objects.create(
+            exercise=exercise_pk, count_number=count_number, checklist=None, photo=None
+        )
         return Response(create_motion.pk)
+
 
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])
 def getuserexercise(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         username = request.GET.get("username")
         user = user_models.User.objects.get(username=username)
         if not user:
             return Response("User Does Not Exist")
         else:
-            queryset = exercise_models.Exercise.objects.get(user = user.id)
+            queryset = exercise_models.Exercise.objects.get(user=user.id)
             if len(queryset) >= 2:
                 serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
             else:
-                serializer = exercise_serializer.ExerciseSerializer(queryset, many=False)
+                serializer = exercise_serializer.ExerciseSerializer(
+                    queryset, many=False
+                )
             return Response(serializer.data)
+
 
 # 'apis/users/getuserfeedback - 자세한 피드백을 위해 유저 피드백 내용(Motion 모델)을 들고와 웹에 뿌려주는 API
 save_data = []
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def getuserfeedback(request):
     # 운동이 끝나서 이 함수가 호출되므로, count 변수 초기화!
     global count
     count = 1
 
-    if request.method == 'GET':
+    if request.method == "GET":
         username = request.GET.get("username")
         date = request.GET.get("date")
-        user = user_models.User.objects.get(username = username)
+        user = user_models.User.objects.get(username=username)
         if not user:
             return Response("User Does Not Exist")
         else:
             # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
             queryset = exercise_models.Motion.objects.filter(
-            exercise = exercise_models.Exercise.objects.get(user = user.id, created=date))
+                exercise=exercise_models.Exercise.objects.get(
+                    user=user.id, created=date
+                )
+            )
 
-            for i in range (len(queryset)):
+            for i in range(len(queryset)):
                 # Motion 모델을 보고 등 분석이 진행이 안돼어 있을 시, 등 분석 진행!
                 if queryset[i].feedback_check == False:
                     # 모델에서 이미지 가져오기 - 배경 제거도 해야함
                     image_data = queryset[i].photo
                     rmbg = util.NewRemoveBg(util.API_KEY, "error.log")
                     image_arr = rmbg.remove_background_from_base64_img(image_data)
-                    '''
+                    """
                     # 배경 제거 후
                     image_arr = base64.b64decode(image_data)
                     with open('images/test.jpeg', 'wb') as f:
@@ -134,13 +148,15 @@ def getuserfeedback(request):
                     f.close()
                     image_arr = cv2.imread('test.jpeg', 1)
                     image_arr = numpy.array(image_arr)
-                    '''
+                    """
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
                     backlineflag = feedback.checkbackline(save_data[i], image_arr)
                     if backlineflag == True:
-                        queryset[i].checklist.add(exercise_models.Checklist.objects.get(pk = 6))
+                        queryset[i].checklist.add(
+                            exercise_models.Checklist.objects.get(pk=6)
+                        )
                         queryset[i].feedback_check = True
-            
+
             # 변수 초기화
             save_data.clear()
 
@@ -150,6 +166,7 @@ def getuserfeedback(request):
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             print(serializer.data)
             return Response(serializer.data)
+
 
 # 'apis/images/saveimages' - 유저의 운동이미지를 받아와서 저장하는 함수
 @api_view(["POST"])
@@ -163,9 +180,12 @@ def saveimage(request):
         image_data = base64.b64decode(image_data)
 
         queryset = exercise_models.Motion.objects.filter(
-            exercise = exercise_models.Exercise.objects.get(pk = exercise_pk), count_number = count_number)
-        queryset.update(photo = image_data)
+            exercise=exercise_models.Exercise.objects.get(pk=exercise_pk),
+            count_number=count_number,
+        )
+        queryset.update(photo=image_data)
     return Response()
+
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 
@@ -173,6 +193,7 @@ pose_list = []
 url_list = []
 feedback_result = []
 is_person_gone_to_stand = "no"
+
 
 @api_view(["POST"])
 def getjointpoint(request):
@@ -182,6 +203,7 @@ def getjointpoint(request):
     image_url = request.data["url"]
 
     if request.method == "POST":
+        isFaceForward(data)
         # 카메라 세팅 체크
         camSetFlag = isCameraSetted(data)
         if camSetFlag == True:
@@ -213,10 +235,12 @@ def getjointpoint(request):
                         # 등 분석을 위해 관절 포인트 전역변수에 저장
                         save_data.append(data)
                         # URL 샘플링
-                        image_data = url_list[max_hip_y_index].replace("data:image/webp;base64,", "")
-                        '''
+                        image_data = url_list[max_hip_y_index].replace(
+                            "data:image/webp;base64,", ""
+                        )
+                        """
                         image_arr = base64.b64decode(image_data)
-                        with open('test.jpeg', 'wb') as f:
+                        with open("test.jpeg", "wb") as f:
                             f.write(image_arr)
                         f.close()
                         image_arr = cv2.imread('test.jpeg', 1)
@@ -224,32 +248,40 @@ def getjointpoint(request):
 
                         # 간단한 방법?
                         #image_arr = numpy.fromstring(base64.b64decode(image_data), numpy.uint8)
-                        '''
+                        """
                         feedback_result.append(isUpperbodyNotBent(data))
-                        feedback_result.append(isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+                        feedback_result.append(
+                            isFaceForward(data)
+                        )  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
                         feedback_result.append(feedback.checkRangeofmotion(data))
                         feedback_result.append(feedback.checkKneeposition(data))
-                        feedback_result.append(feedback.checkCenterofgravity(data)) # 무게중심 깐깐함
+                        feedback_result.append(
+                            feedback.checkCenterofgravity(data)
+                        )  # 무게중심 깐깐함
+                        # feedback_result.append(feedback.checkbackline(data, image_arr))
                         print("피드백 결과 : ", feedback_result)
                         # 속도를 위해 등 처리는 다른 곳으로 빼기, 어디에?
-                        #feedback_result.append(feedback.checkbackline(data, image_arr))
+                        # feedback_result.append(feedback.checkbackline(data, image_arr))
 
                         # DB에 결과 저장
-                        #exercise_pk = request.data["exercisepk"]
-                        #exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
-                        exercise = exercise_models.Exercise.objects.get(pk = 1)
-                        create_motion = exercise_models.Motion.objects.create(exercise=exercise, count_number=count, photo=image_data)
+                        # exercise_pk = request.data["exercisepk"]
+                        exercise = exercise_models.Exercise.objects.get(pk=1)
+                        create_motion = exercise_models.Motion.objects.create(
+                            exercise=exercise, count_number=count, photo=image_data
+                        )
                         # 생성한 Motion 모델에 피드백 결과 checklist 넣기
                         for i in range(len(feedback_result)):
                             if feedback_result[i] == "True":
-                                create_motion.checklist.add(exercise_models.Checklist.objects.get(pk = i))
+                                create_motion.checklist.add(
+                                    exercise_models.Checklist.objects.get(pk=i)
+                                )
 
-                        # 실시간 피드백을 위한 응답 
+                        # 실시간 피드백을 위한 응답
                         feedback_true_count = 0
                         for f in feedback_result:
                             if f == True:
                                 feedback_true_count += 1
-                        
+
                         # 변수 초기화
                         pose_list_for_hip_y.clear()
                         pose_list.clear()
