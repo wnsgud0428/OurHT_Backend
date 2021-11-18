@@ -138,14 +138,17 @@ def checkCenterofgravity(data):
         (left_ankle["y"] + right_ankle["y"]) / 2,
     ]
 
-    # 어깨가 무릎보다 앞으로 나오면 무게중심이 너무 앞으로 쏠린 경우임
-    if waist[0] > knee[0]:  # 왼쪽을 보며 스쿼트하는 경우
+    # 어깨가 무릎보다 과도하게 앞으로 나오면 무게중심이 너무 앞으로 쏠린 경우임
+    if np.abs(shoulder[0] - knee[0]) > 50:
+        return False
+    '''
+    if waist[0] - knee[0]:  # 왼쪽을 보며 스쿼트하는 경우
         if shoulder[0] < knee[0]:
             return False
     else:  # 오른쪽을 보며 스쿼트하는 경우
         if shoulder[0] > knee[0]:
             return False
-
+    '''
     # 어깨와 발목이 비슷한 좌표 포인트에서 움직이는지 판단!
     diff = np.abs(shoulder[0] - ankle[0])
     if diff < 50:
