@@ -33,7 +33,7 @@ def checkRangeofmotion(data):
     # print(between_degree)
 
     # 최종 자세판단
-    '''
+    """
     if np.abs(waist_to_knee_slope) < 5:
         if between_degree > 50 and between_degree < 90:
             print("1-2: 가동범위 굿")
@@ -44,9 +44,9 @@ def checkRangeofmotion(data):
         return 2
     else:
         return 1
-        '''
+        """
     if np.abs(waist_to_knee_slope) < 5:
-        if between_degree > 50 and between_degree < 90:
+        if 50 < between_degree < 90:
             print("1-2: 가동범위 굿")
             return True
         else:
@@ -157,6 +157,7 @@ def checkCenterofgravity(data):
     else:
         return False
 
+
 def checkbackline(data, image):
     # 관절 좌표 처리
     left_shoulder = data["keypoints"][5]["position"]
@@ -177,9 +178,13 @@ def checkbackline(data, image):
     # 이미지와 관절 좌표 이용하여, 등 경계선과의 거리 측정하기
     slope = util.find_straightslope(shoulder[0], shoulder[1], waist[0], waist[1])
     if shoulder[0] < waist[0]:
-        distance = util.find_distancefromboarderline(image, slope, int(shoulder[0]), int(shoulder[1]), int(waist[0]))
+        distance = util.find_distancefromboarderline(
+            image, slope, int(shoulder[0]), int(shoulder[1]), int(waist[0])
+        )
     else:
-        distance = util.find_distancefromboarderline(image, slope, int(waist[0]), int(waist[1]), int(shoulder[0]))
+        distance = util.find_distancefromboarderline(
+            image, slope, int(waist[0]), int(waist[1]), int(shoulder[0])
+        )
 
     print("거리의 최대 차이 : ", max(distance), min(distance))
     diff = max(distance) - min(distance)

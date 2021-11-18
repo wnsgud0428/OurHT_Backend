@@ -40,14 +40,14 @@ def isCameraSetted(data):
 
     ### 어깨의 측면view 정렬을 위해
     # print(mis_align)
-    if mis_align < 20:
+    if mis_align < 50:
         is_shoulder_sideview = True
         # print("1-1-3: 측면으로 잘 섰습니다")
     else:
         is_shoulder_sideview = False
         # print("몸을 틀어, 측면이 잘 보이도록 조정해주세요!")
 
-    if is_ankle_show and is_ankle_mid and is_shoulder_sideview == True:
+    if is_ankle_mid and is_shoulder_sideview == True:
         print("1-1: 카메라 세팅 완료")
         return True
     else:
