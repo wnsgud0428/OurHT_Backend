@@ -1,6 +1,4 @@
-from rest_framework.fields import flatten_choices_dict
 import util, numpy as np, cv2
-
 
 def checkRangeofmotion(data):
     # 좌표 받아오기
@@ -30,7 +28,6 @@ def checkRangeofmotion(data):
 
     # 골반 - 무릎 - 발목 각도 찾기
     between_degree = util.calculate_angle(waist, knee, ankle)
-    # print(between_degree)
 
     # 최종 자세판단
     '''

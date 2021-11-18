@@ -70,7 +70,8 @@ def login(request):
 def createexercise(request):
     if request.method == 'POST':
         #userid = request.data["userid"]
-        create_exercise = exercise_models.Exercise.objects.create(user="super", type=1)
+        user = user_models.User.objects.get(id = 1)
+        create_exercise = exercise_models.Exercise.objects.create(user=user, type=1)
         return Response(create_exercise.pk)
 
 # 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함 // 필요 없을 듯?
