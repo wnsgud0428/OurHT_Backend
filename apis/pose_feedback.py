@@ -41,10 +41,10 @@ def isUpperbodyNotBent(data):
     # print(f"어깨-엉덩이-무릎 각도:{shoulder_hip_knee_angle}")
     # print(f"엉덩이-무릎-발목 각도:{hip_knee_ankle_angle}")
 
-    if 50 < shoulder_hip_knee_angle < 90:
+    if 35 < shoulder_hip_knee_angle < 90:
         is_upperbody_not_bent = True
         print("2-3: 적당하게 숙인 각도에요")
-    elif shoulder_hip_knee_angle <= 50:
+    elif shoulder_hip_knee_angle <= 35:
         is_upperbody_not_bent = False
         print("너무 굽었어요!")
     elif shoulder_hip_knee_angle >= 180:
@@ -85,7 +85,7 @@ def isFaceForward(data):
         ear_nose_extra_angle = calculate_angle(right_ear, nose, extra_point)
 
     print(ear_nose_extra_angle)  # test
-    if ear_nose_extra_angle < 20:  # todo: 값 수정
+    if ear_nose_extra_angle < 40:  # todo: 값 수정
         is_face_forward = True
 
     if is_face_forward == True:

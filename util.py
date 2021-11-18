@@ -2,7 +2,7 @@
 # 함수에 매개변수 넣을 때, 수학적인 좌표 기준으로 넣어야함!
 from removebg import RemoveBg
 import requests, logging, math, cv2
-import numpy as np
+import numpy as np, base64
 
 # Removebg API
 API_ENDPOINT = "https://api.remove.bg/v1.0/removebg"
@@ -106,11 +106,8 @@ class NewRemoveBg(RemoveBg):  # 배경제거를 위한 클래스, 메소드 오�
     def __output_file__(self, response, new_file_name):
         # If successful, write out the file
         if response.status_code == requests.codes.ok:
-            with open('images/' + new_file_name, 'wb') as removed_bg_file:
+            with open('photos/' + new_file_name, 'wb') as removed_bg_file:
                 removed_bg_file.write(response.content)
-            removed_bg_file = cv2.imread(new_file_name, 1)
-            removed_bg_file = np.array(removed_bg_file)
-            return removed_bg_file
         # Otherwise, print out the error
         else:
             error_reason = response.json()["errors"][0]["title"].lower()

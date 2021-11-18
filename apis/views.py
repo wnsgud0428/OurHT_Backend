@@ -11,6 +11,7 @@ from .camera_feedback import isCameraSetted
 from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
 from . import feedback
+from PIL import Image
 
 # Create your views here.
 
@@ -125,17 +126,7 @@ def getuserfeedback(request):
 
         exercise_pk = request.GET.get("exercise_pk")
         exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
-        '''
-        if not user:
-            return Response("User Does Not Exist")
-        else:
-            # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
-            queryset = exercise_models.Motion.objects.filter(
-                exercise=exercise_models.Exercise.objects.get(
-                    user=user.id, created=date
-                )
-            )
-        '''
+
         if not exercise:
             return Response("Exercise Does Not Exist")
         else:
@@ -145,19 +136,24 @@ def getuserfeedback(request):
             for i in range(len(queryset)):
                 # Motion 모델을 보고 등 분석이 진행이 안돼어 있을 시, 등 분석 진행!
                 if queryset[i].feedback_check == False:
-                    # 모델에서 이미지 가져오기 - 배경 제거도 해야함
                     image_data = queryset[i].photo
-                    rmbg = util.NewRemoveBg(util.API_KEY, "error.log")
-                    image_arr = rmbg.remove_background_from_base64_img(image_data)
-                    """
-                    # 배경 제거 후
-                    image_arr = base64.b64decode(image_data)
-                    with open('images/test.jpeg', 'wb') as f:
-                        f.write(image_arr)
+                    temp = base64.b64decode(image_data)
+                    with open("photos/test2.webp", "wb") as f:
+                        f.write(temp)
                     f.close()
-                    image_arr = cv2.imread('test.jpeg', 1)
+
+                    im = Image.open('photos/test2.webp').convert('RGB')
+                    im.save('photos/test2.jpg', 'jpeg')
+
+                    with open("photos/test2.jpg","rb") as f:
+                        encode_str = base64.b64encode(f.read())
+
+                    rmbg = util.NewRemoveBg("3MJ8rf5y9xKCEss7sjWmGCn5", "error.log")
+                    rmbg.remove_background_from_base64_img(encode_str)
+
+                    image_arr = cv2.imread("photos/no-bg.png", 1)
                     image_arr = numpy.array(image_arr)
-                    """
+
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
                     backlineflag = feedback.checkbackline(save_data[i], image_arr)
                     if backlineflag == True:
@@ -166,6 +162,7 @@ def getuserfeedback(request):
                         )
                     # 바로 값이 바뀌나?
                     queryset[i].feedback_check = True
+                    queryset[i].save()
 
             # 변수 초기화
             save_data.clear()
@@ -174,7 +171,6 @@ def getuserfeedback(request):
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
-            print(serializer.data)
             return Response(serializer.data)
 
 
@@ -247,17 +243,11 @@ def getjointpoint(request):
                         image_data = url_list[max_hip_y_index].replace(
                             "data:image/webp;base64,", ""
                         )
-                        """
-                        image_arr = base64.b64decode(image_data)
-                        with open("test.jpeg", "wb") as f:
-                            f.write(image_arr)
+                        temp = base64.b64decode(image_data)
+                        with open("photos/test.webp", "wb") as f:
+                            f.write(temp)
                         f.close()
-                        image_arr = cv2.imread('test.jpeg', 1)
-                        image_arr = numpy.array(image_arr)
-
-                        # 간단한 방법?
-                        #image_arr = numpy.fromstring(base64.b64decode(image_data), numpy.uint8)
-                        """
+                    
                         feedback_result.append(isUpperbodyNotBent(sampling_data))
                         feedback_result.append(
                             isFaceForward(sampling_data)
@@ -271,7 +261,7 @@ def getjointpoint(request):
 
                         # DB에 결과 저장
                         # exercise_pk = request.data["exercisepk"]
-                        exercise = exercise_models.Exercise.objects.get(pk=1)
+                        exercise = exercise_models.Exercise.objects.get(pk=5)
                         create_motion = exercise_models.Motion.objects.create(
                             exercise=exercise, count_number=count, photo=image_data
                         )
@@ -281,6 +271,7 @@ def getjointpoint(request):
                                 create_motion.checklist.add(
                                     exercise_models.Checklist.objects.get(pk=i)
                                 )
+                                create_motion.save()
 
                         # 실시간 피드백을 위한 응답
                         feedback_true_count = 0
@@ -291,6 +282,7 @@ def getjointpoint(request):
                         # 변수 초기화
                         pose_list_for_hip_y.clear()
                         pose_list.clear()
+                        url_list.clear()
                         feedback_result.clear()
                         count += 1
 

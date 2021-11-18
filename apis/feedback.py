@@ -188,7 +188,7 @@ def checkbackline(data, image):
 
     print("거리의 최대 차이 : ", max(distance), min(distance))
     diff = max(distance) - min(distance)
-    if diff > 50:
+    if diff > 20:
         return False
     else:
         return True
