@@ -1,9 +1,12 @@
-# 잡다하게 필요한 것 같은 함수들
 # 모두 수학적인 좌표 기준으로 작성
 # 함수에 매개변수 넣을 때, 수학적인 좌표 기준으로 넣어야함!
-
+from removebg import RemoveBg
+import requests, logging, math, cv2
 import numpy as np
-import math, cv2
+
+# Removebg API
+API_ENDPOINT = "https://api.remove.bg/v1.0/removebg"
+API_KEY = "eihrhcx6ZmqHYx69CZna8mHa"
 
 # 임의의 두 점이 주어질 때, 직선의 기울기 찾기
 def find_straightslope(first_x, first_y, second_x, second_y):
@@ -94,3 +97,60 @@ def calculate_angle(a, b, c):
         angle = 360 - angle
 
     return angle
+
+class NewRemoveBg(RemoveBg):  # 배경제거를 위한 클래스, 메소드 오버라이드
+    def __init__(self, api_key, error_log_file):
+        self.__api_key = api_key
+        logging.basicConfig(filename=error_log_file)
+
+    def __output_file__(self, response, new_file_name):
+        # If successful, write out the file
+        if response.status_code == requests.codes.ok:
+            with open('images/' + new_file_name, 'wb') as removed_bg_file:
+                removed_bg_file.write(response.content)
+            removed_bg_file = cv2.imread(new_file_name, 1)
+            removed_bg_file = np.array(removed_bg_file)
+            return removed_bg_file
+        # Otherwise, print out the error
+        else:
+            error_reason = response.json()["errors"][0]["title"].lower()
+            logging.error("Unable to save %s due to %s", new_file_name, error_reason)
+
+    def remove_background_from_img_file(
+        self, img_file_path, size="regular", bg_color=None
+    ):
+        # Open image file to send information post request and send the post request
+        img_file = open(img_file_path, "rb")
+        response = requests.post(
+            API_ENDPOINT,
+            files={"image_file": img_file},
+            data={"size": size, "bg_color": bg_color},
+            headers={"X-Api-Key": self.__api_key},
+        )
+        response.raise_for_status()
+        self.__output_file__(response, img_file.name + "_removebg.png")  # 출력 파일 이름 변경
+
+        img_file.close()
+    
+    def remove_background_from_base64_img(
+        self, base64_img, size="regular", new_file_name="no-bg.png", bg_color=None
+    ):
+        response = requests.post(
+            API_ENDPOINT,
+            data={
+                'image_file_b64': base64_img,
+                'size': size,
+                'bg_color': bg_color
+            },
+            headers={'X-Api-Key': self.__api_key}
+        )
+        response.raise_for_status()
+        self.__output_file__(response, new_file_name)
+
+'''
+rmbg = NewRemoveBg(API_KEY, "error.log")
+with open('testimagege.jpg', 'rb') as f:
+    encode_str = base64.b64encode(f.read())
+#rmbg.remove_background_from_img_file("testimage.png")
+rmbg.remove_background_from_base64_img(encode_str)
+'''
