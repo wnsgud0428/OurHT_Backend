@@ -119,9 +119,13 @@ def getuserfeedback(request):
     count = 1
 
     if request.method == "GET":
-        username = request.GET.get("username")
-        date = request.GET.get("date")
-        user = user_models.User.objects.get(username=username)
+        #username = request.GET.get("username")
+        #date = request.GET.get("date")
+        #user = user_models.User.objects.get(username=username)
+
+        exercise_pk = request.GET.get("exercise_pk")
+        exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+        '''
         if not user:
             return Response("User Does Not Exist")
         else:
@@ -131,6 +135,12 @@ def getuserfeedback(request):
                     user=user.id, created=date
                 )
             )
+        '''
+        if not exercise:
+            return Response("Exercise Does Not Exist")
+        else:
+            # 유저를 알았으니, 그 유저에 맞는 피드백 찾기
+            queryset = exercise_models.Motion.objects.filter(exercise=exercise)
 
             for i in range(len(queryset)):
                 # Motion 모델을 보고 등 분석이 진행이 안돼어 있을 시, 등 분석 진행!
