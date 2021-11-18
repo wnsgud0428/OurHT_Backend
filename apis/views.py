@@ -203,7 +203,6 @@ def getjointpoint(request):
     image_url = request.data["url"]
 
     if request.method == "POST":
-        isFaceForward(data)
         # 카메라 세팅 체크
         camSetFlag = isCameraSetted(data)
         if camSetFlag == True:
