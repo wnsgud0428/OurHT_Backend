@@ -120,10 +120,7 @@ def getuserfeedback(request):
     count = 1
 
     if request.method == "GET":
-        #username = request.GET.get("username")
-        #date = request.GET.get("date")
-        #user = user_models.User.objects.get(username=username)
-
+        
         exercise_pk = request.GET.get("exercise_pk")
         exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
 
@@ -159,6 +156,8 @@ def getuserfeedback(request):
                     if backlineflag == True:
                         queryset[i].checklist.add(
                             exercise_models.Checklist.objects.get(pk=6)
+                            #exercise_models.Checklist.objects.get(pk=6).id
+                            #queryset[0].checklist.add(3) -> 이게 되는듯
                         )
                     # 바로 값이 바뀌나?
                     queryset[i].feedback_check = True
@@ -270,6 +269,8 @@ def getjointpoint(request):
                             if feedback_result[i] == "True":
                                 create_motion.checklist.add(
                                     exercise_models.Checklist.objects.get(pk=i)
+                                    #exercise_models.Checklist.objects.get(pk=6).id
+                                    #queryset[0].checklist.add(3) -> 이게 되는듯
                                 )
                                 create_motion.save()
 
