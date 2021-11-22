@@ -73,8 +73,8 @@ def login(request):
 @api_view(["POST"])
 def createexercise(request):
     if request.method == "POST":
-        # userid = request.data["userid"]
-        user = user_models.User.objects.get(id=1)
+        userid = request.data["userid"]
+        user = user_models.User.objects.get(id=userid)
         create_exercise = exercise_models.Exercise.objects.create(user=user, type=1)
         return Response(create_exercise.pk)
 
@@ -120,11 +120,8 @@ def getuserfeedback(request):
     count = 1
 
     if request.method == "GET":
-        #username = request.GET.get("username")
-        #date = request.GET.get("date")
-        #user = user_models.User.objects.get(username=username)
-
         exercise_pk = request.GET.get("exercise_pk")
+        motion_index = request.GET.get("motion_index")
         exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
 
         if not exercise:
@@ -157,9 +154,7 @@ def getuserfeedback(request):
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
                     backlineflag = feedback.checkbackline(save_data[i], image_arr)
                     if backlineflag == True:
-                        queryset[i].checklist.add(
-                            exercise_models.Checklist.objects.get(pk=6)
-                        )
+                        queryset[i].checklist.add(3)
                     # 바로 값이 바뀌나?
                     queryset[i].feedback_check = True
                     queryset[i].save()
@@ -167,12 +162,19 @@ def getuserfeedback(request):
             # 변수 초기화
             save_data.clear()
 
+            if motion_index == 999:
+                serializer = exercise_serializer.MotionSerializer(queryset, many=True)
+            else:
+                queryset = queryset[motion_index - 1]
+                serializer = exercise_serializer.MotionSerializer(queryset, many=False)
+            return Response(serializer.data)   
+            '''
             if len(queryset) >= 2:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             return Response(serializer.data)
-
+            '''
 
 # 'apis/images/saveimages' - 유저의 운동이미지를 받아와서 저장하는 함수
 @api_view(["POST"])
@@ -195,15 +197,15 @@ def saveimage(request):
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 
-pose_list = []
-url_list = []
+#pose_list = []
+#url_list = []
 feedback_result = []
-is_person_gone_to_stand = "no"
+#is_person_gone_to_stand = "no"
 
 
 @api_view(["POST"])
 def getjointpoint(request):
-
+    '''
     global is_person_gone_to_stand, count
     data = request.data["skeletonpoint"]
     image_url = request.data["url"]
@@ -298,3 +300,62 @@ def getjointpoint(request):
             return Response("운동 진행 중")
         else:
             return Response("카메라 세팅 다시 하세요")
+    '''
+    # 프론트와 분리한 새 버전
+    print("Hello New Function")
+    data = request.data["skeletonpoint"]
+    image_url = request.data["url"]
+    count = request.data["count"]
+
+    image_data = image_url.replace("data:image/webp;base64,", "")
+    # image_data = base64.b64decode(image_data)
+    # with open("photos/test.webp", "wb") as f:
+    #     f.write(image_data)
+    # f.close()
+
+    feedback_result.append(isUpperbodyNotBent(data))
+    feedback_result.append(isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+    feedback_result.append(feedback.checkRangeofmotion(data))
+    feedback_result.append(feedback.checkKneeposition(data))
+    feedback_result.append(
+        feedback.checkCenterofgravity(data)
+    )  # 무게중심 깐깐함
+    print("피드백 결과 : ", feedback_result)
+
+    # DB에 결과 저장
+    # exercise_pk = request.data["exercise_pk"]
+    #exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+    print("Motion 모델 생성")
+    exercise = exercise_models.Exercise.objects.get(pk=6)
+    create_motion = exercise_models.Motion.objects.create(
+        exercise=exercise, count_number=count, photo=image_data
+    )
+
+    # 생성한 Motion 모델에 피드백 결과 checklist 넣기
+    for i in range(len(feedback_result)):
+        if feedback_result[i] == "True":
+            '''
+            create_motion.checklist.add(
+                exercise_models.Checklist.objects.get(pk=i)
+            )
+            '''
+            create_motion.checklist.add(i + 5)
+            create_motion.save()
+
+    # 실시간 피드백을 위한 응답
+    feedback_true_count = 0
+    for f in feedback_result:
+        if f == True:
+            feedback_true_count += 1
+
+    # 변수 초기화
+    feedback_result.clear()
+
+    # 결과
+    print("결과 : ", count, feedback_true_count)
+    if feedback_true_count >= 4:
+        return Response("Perfect")
+    elif feedback_true_count <= 1:
+        return Response("Bad")
+    else:
+        return Response("Good")

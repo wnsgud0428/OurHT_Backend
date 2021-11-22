@@ -30,7 +30,6 @@ class MotionAdmin(admin.ModelAdmin):
     list_display = (
             "exercise",
             "count_number",
-            "photo",
             "feedback_check",
     )
 

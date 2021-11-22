@@ -17,3 +17,11 @@ querysets[0].exercise.user
 # 필터 써서 쿼리셋 찾기
 queryset = exercise_models.Motion.objects.filter(count_number = 1)
 '''
+
+
+import exercises.models as exercise_models
+
+
+queryset = exercise_models.Motion.objects.all()
+queryset[0].feedback_check = True
+queryset[0].save()
