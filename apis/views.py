@@ -1,4 +1,4 @@
-import cv2, numpy, util
+import cv2, numpy, util, base64
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -6,17 +6,12 @@ from users import serializer as user_serializer
 from exercises import serializer as exercise_serializer
 from users import models as user_models
 from exercises import models as exercise_models
-import base64
 from .camera_feedback import isCameraSetted
-from .pose_feedback import isFaceForward, isUpperbodyNotBent
 from .squat_state_check import returnSquatState
 from . import feedback
 from PIL import Image
 
 # Create your views here.
-
-count = 1
-
 
 @api_view(["GET"])
 # 주석 달기
@@ -115,9 +110,6 @@ save_data = []
 
 @api_view(["GET"])
 def getuserfeedback(request):
-    # 운동이 끝나서 이 함수가 호출되므로, count 변수 초기화!
-    global count
-    count = 1
 
     if request.method == "GET":
         exercise_pk = request.GET.get("exercise_pk")
@@ -167,32 +159,7 @@ def getuserfeedback(request):
             else:
                 queryset = queryset[motion_index - 1]
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
-            return Response(serializer.data)   
-            '''
-            if len(queryset) >= 2:
-                serializer = exercise_serializer.MotionSerializer(queryset, many=True)
-            else:
-                serializer = exercise_serializer.MotionSerializer(queryset, many=False)
-            return Response(serializer.data)
-            '''
-
-# 'apis/images/saveimages' - 유저의 운동이미지를 받아와서 저장하는 함수
-@api_view(["POST"])
-def saveimage(request):
-    # 'api/images'으로 온 POST 요청 처리 -> Image 객체 생성
-    if request.method == "POST":
-        exercise_pk = request.data["exercisepk"]
-        count_number = request.data["countnumber"]
-        image_url = request.data["url"]
-        image_data = image_url.replace("data:image/jpeg;base64,", "")
-        image_data = base64.b64decode(image_data)
-
-        queryset = exercise_models.Motion.objects.filter(
-            exercise=exercise_models.Exercise.objects.get(pk=exercise_pk),
-            count_number=count_number,
-        )
-        queryset.update(photo=image_data)
-    return Response()
+            return Response(serializer.data) 
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
@@ -304,17 +271,16 @@ def getjointpoint(request):
     # 프론트와 분리한 새 버전
     print("Hello New Function")
     data = request.data["skeletonpoint"]
-    image_url = request.data["url"]
     count = request.data["count"]
+    image_data = request.data["url"].replace("data:image/webp;base64,", "")
 
-    image_data = image_url.replace("data:image/webp;base64,", "")
     # image_data = base64.b64decode(image_data)
     # with open("photos/test.webp", "wb") as f:
     #     f.write(image_data)
     # f.close()
 
-    feedback_result.append(isUpperbodyNotBent(data))
-    feedback_result.append(isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+    feedback_result.append(feedback.isUpperbodyNotBent(data))
+    feedback_result.append(feedback.isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
     feedback_result.append(feedback.checkRangeofmotion(data))
     feedback_result.append(feedback.checkKneeposition(data))
     feedback_result.append(
@@ -324,7 +290,7 @@ def getjointpoint(request):
 
     # DB에 결과 저장
     # exercise_pk = request.data["exercise_pk"]
-    #exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+    # exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
     print("Motion 모델 생성")
     exercise = exercise_models.Exercise.objects.get(pk=6)
     create_motion = exercise_models.Motion.objects.create(
@@ -333,14 +299,14 @@ def getjointpoint(request):
 
     # 생성한 Motion 모델에 피드백 결과 checklist 넣기
     for i in range(len(feedback_result)):
-        if feedback_result[i] == "True":
+        if feedback_result[i] == True:
             '''
             create_motion.checklist.add(
                 exercise_models.Checklist.objects.get(pk=i)
             )
             '''
             create_motion.checklist.add(i + 5)
-            create_motion.save()
+    create_motion.save()
 
     # 실시간 피드백을 위한 응답
     feedback_true_count = 0

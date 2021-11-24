@@ -12,6 +12,5 @@ urlpatterns = [
     path('users/getuserfeedback', views.getuserfeedback, name="getuserfeedback"),
 
     # Image 관련 API
-    path('images/saveimage', views.saveimage, name="saveimage"),
     path('images/getjointpoint', views.getjointpoint, name='getjointpoint'),
 ]

@@ -11,13 +11,11 @@ class ExerciseSerializer(ModelSerializer):
         fields = '__all__'
 
 class ChecklistSerializer(ModelSerializer):
-    print("Checklist")
     class Meta:
         model = exercise_models.Checklist
         fields = '__all__'
 
 class MotionSerializer(ModelSerializer):
-    print("Motion")
     checklist = ChecklistSerializer(read_only=True, many=True)
     class Meta:
         model = exercise_models.Motion
