@@ -12,6 +12,7 @@ numpy = "*"
 opencv-python = "*"
 matplotlib = "*"
 removebg = "*"
+scipy = "*"
 
 [dev-packages]
 black = "*"
