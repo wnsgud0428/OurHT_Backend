@@ -114,6 +114,7 @@ def getuserfeedback(request):
     if request.method == "GET":
         exercise_pk = request.GET.get("exercise_pk")
         motion_index = request.GET.get("motion_index")
+        print(exercise_pk, motion_index)
         exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
 
         if not exercise:
@@ -137,7 +138,7 @@ def getuserfeedback(request):
                     with open("photos/test2.jpg","rb") as f:
                         encode_str = base64.b64encode(f.read())
 
-                    rmbg = util.NewRemoveBg("3MJ8rf5y9xKCEss7sjWmGCn5", "error.log")
+                    rmbg = util.NewRemoveBg("iH4AoLSs2an9EiS8LPSiqAqp", "error.log")
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image_arr = cv2.imread("photos/no-bg.png", 1)
@@ -154,7 +155,7 @@ def getuserfeedback(request):
             # 변수 초기화
             save_data.clear()
 
-            if int(motion_index) == 999:
+            if motion_index == "999":
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
                 queryset = queryset[int(motion_index) - 1]
@@ -287,6 +288,8 @@ def getjointpoint(request):
         feedback.checkCenterofgravity(data)
     )  # 무게중심 깐깐함
     print("피드백 결과 : ", feedback_result)
+
+    save_data.append(data)
 
     # DB에 결과 저장
     print(request.data["exercise_pk"])

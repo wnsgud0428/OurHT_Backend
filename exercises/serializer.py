@@ -13,7 +13,7 @@ class ExerciseSerializer(ModelSerializer):
 class ChecklistSerializer(ModelSerializer):
     class Meta:
         model = exercise_models.Checklist
-        fields = '__all__'
+        fields = ('pk',)
 
 class MotionSerializer(ModelSerializer):
     checklist = ChecklistSerializer(read_only=True, many=True)
