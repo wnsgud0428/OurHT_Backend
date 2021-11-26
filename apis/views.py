@@ -138,7 +138,7 @@ def getuserfeedback(request):
                     with open("photos/test2.jpg","rb") as f:
                         encode_str = base64.b64encode(f.read())
 
-                    rmbg = util.NewRemoveBg("iH4AoLSs2an9EiS8LPSiqAqp", "error.log")
+                    rmbg = util.NewRemoveBg("yLhTTo4uCPsYtMAyqFviYCKN", "error.log")
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image_arr = cv2.imread("photos/no-bg.png", 1)
