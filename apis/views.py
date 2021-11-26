@@ -289,10 +289,9 @@ def getjointpoint(request):
     print("피드백 결과 : ", feedback_result)
 
     # DB에 결과 저장
-    # exercise_pk = request.data["exercise_pk"]
-    # exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
-    print("Motion 모델 생성")
-    exercise = exercise_models.Exercise.objects.get(pk=6)
+    print(request.data["exercise_pk"])
+    exercise_pk = request.data["exercise_pk"]
+    exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
     create_motion = exercise_models.Motion.objects.create(
         exercise=exercise, count_number=count, photo=image_data
     )
@@ -300,12 +299,7 @@ def getjointpoint(request):
     # 생성한 Motion 모델에 피드백 결과 checklist 넣기
     for i in range(len(feedback_result)):
         if feedback_result[i] == True:
-            '''
-            create_motion.checklist.add(
-                exercise_models.Checklist.objects.get(pk=i)
-            )
-            '''
-            create_motion.checklist.add(i + 5)
+            create_motion.checklist.add(i + 1)
     create_motion.save()
 
     # 실시간 피드백을 위한 응답
