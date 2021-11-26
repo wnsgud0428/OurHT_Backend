@@ -45,6 +45,7 @@ def checkRangeofmotion(data):
     else:
         return 1
         """
+
     if np.abs(waist_to_knee_slope) < 5:
         if 50 < between_degree < 90:
             print("1-2: 가동범위 굿")
@@ -318,31 +319,36 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
             if point[0] > left_shoulder[0] and point[1] < left_hip[1]:
                 if isPointUnderTheLine(line_equ_coef, point):
                     want_point_list.append(point)
-    print("want_point_list:")
-    print(want_point_list)
+
     # print((smoothened[0][0][0]))
     # print(smoothened[1])
 
     slope_diff_sum = 0
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
     print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
-    want_point_list_len = len(want_point_list)
-    want_point_list.reverse()  # 어깨에 있는 점을 먼저 list에  저장하기 위함
 
-    # for i in range(want_point_list_len):
-    #     # 파란색으로 등에있는 점 찍기
+    print(type(want_point_list))
+    want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
+    want_point_list = list(map(list, want_point_list))  # 중복제거..
+    want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
+
+    print("want_point_list:", want_point_list)
+
+    # num_of_check_point = len(want_point_list)
+    num_of_check_point = 7
+
+    # 파란색으로 등 라인 그리기
+    # for i in range(num_of_check_point - 1):
     #     cv2.line(
     #         image,
     #         want_point_list[i],
-    #         want_point_list[i],
+    #         want_point_list[i + 1],
     #         (255, 0, 0),
     #         thickness=3,
     #         lineType=None,
     #         shift=None,
     #     )
-    # print(want_point_list_len)
 
-    num_of_check_point = 5
     # 모든 점을 다 이용해서 검사하면 이상하게 됨
     # 어깨쪽에 있는 점들 위주로 이용해서 검사하는게 정확할듯
     for i in range(num_of_check_point):
@@ -356,21 +362,44 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
             lineType=None,
             shift=None,
         )
+    ###기존의 back_point_slope와 shoulder_to_hip_slope의 차이를 sum해서 측정하는 방식
+    ###문제가 좀 있는듯
+    # for i in range(num_of_check_point) - 1:
+    #     coef = returnLineEquCoef(want_point_list[i], want_point_list[i + 1])
+    #     back_point_slope = coef[0]
+    #     slope_diff = abs(shoulder_to_hip_slope - back_point_slope)
+    #     print(slope_diff)
+    #     slope_diff_sum += slope_diff
+    # print("slope_diff_sum:", slope_diff_sum)
 
-        if i < num_of_check_point - 1:
-            coef = returnLineEquCoef(want_point_list[i], want_point_list[i + 1])
-            back_point_slope = coef[0]
-            slope_diff = abs(shoulder_to_hip_slope - back_point_slope)
-            print(slope_diff)
-            slope_diff_sum += slope_diff
-    print("slope_diff_sum:", slope_diff_sum)
+    # ###기울기의 변화량을 이용하여 측정
+    # slope_diff_of_neighbor_line_sum = 0
+    # for i in range(num_of_check_point - 2):
+    #     coef1 = returnLineEquCoef(want_point_list[i], want_point_list[i + 1])
+    #     coef2 = returnLineEquCoef(want_point_list[i + 1], want_point_list[i + 2])
 
+    #     slope_diff_of_neighbor_line = abs(coef2[0] - coef1[0])
+    #     print(slope_diff_of_neighbor_line)
+    #     slope_diff_of_neighbor_line_sum += slope_diff_of_neighbor_line
+    # print("slope_diff_of_neighbor_line_sum:", slope_diff_of_neighbor_line_sum)
+
+    ###첫부분의 기울기와 끝부분의 기울기의 차이 이용
+    coef1 = returnLineEquCoef(want_point_list[0], want_point_list[1])
+    coef2 = returnLineEquCoef(
+        want_point_list[num_of_check_point - 2], want_point_list[num_of_check_point - 1]
+    )
+    shoulder_part_slope = coef1[0]
+    hip_part_slope = coef2[0]
+    print("shoulder_part_slope:", shoulder_part_slope)
+    print("hip_part_slope:", hip_part_slope)
+    hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
+    print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
     # 보여주는 부분
     cv2.imshow("output_image", output_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    if slope_diff_sum < 1:
+    if hip_shoulder_slope_diff < 0.5:
         print("좋은 허리")
         return True
     else:
@@ -564,96 +593,189 @@ elif image_input_type == "good":
         ],
     }
 else:
-    image = cv2.imread("test_images/no-bg.png")
-    data = {
-        "score": 0.8743049355552477,
-        "keypoints": [
-            {
-                "score": 0.9872514009475708,
-                "part": "nose",
-                "position": {"x": 182.56446452456225, "y": 197.27179808937822},
-            },
-            {
-                "score": 0.9854617118835449,
-                "part": "leftEye",
-                "position": {"x": 184.10999817607004, "y": 184.96126639410622},
-            },
-            {
-                "score": 0.4244021773338318,
-                "part": "rightEye",
-                "position": {"x": 177.24789868069067, "y": 184.01433598809908},
-            },
-            {
-                "score": 0.9961262941360474,
-                "part": "leftEar",
-                "position": {"x": 212.83945996473736, "y": 172.44899611398964},
-            },
-            {
-                "score": 0.048550475388765335,
-                "part": "rightEar",
-                "position": {"x": 188.52637858706225, "y": 186.98309231298575},
-            },
-            {
-                "score": 0.9994828701019287,
-                "part": "leftShoulder",
-                "position": {"x": 256.8241959508755, "y": 209.4127532484618},
-            },
-            {
-                "score": 0.9895740151405334,
-                "part": "rightShoulder",
-                "position": {"x": 228.71502234314204, "y": 215.72418054768457},
-            },
-            {
-                "score": 0.99922776222229,
-                "part": "leftElbow",
-                "position": {"x": 253.15256794139106, "y": 271.13001690009713},
-            },
-            {
-                "score": 0.7465185523033142,
-                "part": "rightElbow",
-                "position": {"x": 216.94558228964007, "y": 253.84051545296307},
-            },
-            {
-                "score": 0.9970807433128357,
-                "part": "leftWrist",
-                "position": {"x": 177.49188731152725, "y": 267.01752499595204},
-            },
-            {
-                "score": 0.8548148274421692,
-                "part": "rightWrist",
-                "position": {"x": 177.42941771035993, "y": 259.2761862957416},
-            },
-            {
-                "score": 0.9964235424995422,
-                "part": "leftHip",
-                "position": {"x": 336.4056800218872, "y": 333.7291278740285},
-            },
-            {
-                "score": 0.9797573685646057,
-                "part": "rightHip",
-                "position": {"x": 304.1603652419747, "y": 329.5813431023316},
-            },
-            {
-                "score": 0.9982239603996277,
-                "part": "leftKnee",
-                "position": {"x": 234.82931055447472, "y": 321.737560212921},
-            },
-            {
-                "score": 0.9412000179290771,
-                "part": "rightKnee",
-                "position": {"x": 230.1957874817607, "y": 361.4257559504534},
-            },
-            {
-                "score": 0.9969828724861145,
-                "part": "leftAnkle",
-                "position": {"x": 293.0812636794747, "y": 431.44919598040804},
-            },
-            {
-                "score": 0.9221053123474121,
-                "part": "rightAnkle",
-                "position": {"x": 261.4917847154669, "y": 430.4498006395725},
-            },
-        ],
-    }
+    if image_input_type == "test_junhyeong":
+        image = cv2.imread("test_images/no-bg.png")
+        data = {
+            "score": 0.8743049355552477,
+            "keypoints": [
+                {
+                    "score": 0.9872514009475708,
+                    "part": "nose",
+                    "position": {"x": 182.56446452456225, "y": 197.27179808937822},
+                },
+                {
+                    "score": 0.9854617118835449,
+                    "part": "leftEye",
+                    "position": {"x": 184.10999817607004, "y": 184.96126639410622},
+                },
+                {
+                    "score": 0.4244021773338318,
+                    "part": "rightEye",
+                    "position": {"x": 177.24789868069067, "y": 184.01433598809908},
+                },
+                {
+                    "score": 0.9961262941360474,
+                    "part": "leftEar",
+                    "position": {"x": 212.83945996473736, "y": 172.44899611398964},
+                },
+                {
+                    "score": 0.048550475388765335,
+                    "part": "rightEar",
+                    "position": {"x": 188.52637858706225, "y": 186.98309231298575},
+                },
+                {
+                    "score": 0.9994828701019287,
+                    "part": "leftShoulder",
+                    "position": {"x": 256.8241959508755, "y": 209.4127532484618},
+                },
+                {
+                    "score": 0.9895740151405334,
+                    "part": "rightShoulder",
+                    "position": {"x": 228.71502234314204, "y": 215.72418054768457},
+                },
+                {
+                    "score": 0.99922776222229,
+                    "part": "leftElbow",
+                    "position": {"x": 253.15256794139106, "y": 271.13001690009713},
+                },
+                {
+                    "score": 0.7465185523033142,
+                    "part": "rightElbow",
+                    "position": {"x": 216.94558228964007, "y": 253.84051545296307},
+                },
+                {
+                    "score": 0.9970807433128357,
+                    "part": "leftWrist",
+                    "position": {"x": 177.49188731152725, "y": 267.01752499595204},
+                },
+                {
+                    "score": 0.8548148274421692,
+                    "part": "rightWrist",
+                    "position": {"x": 177.42941771035993, "y": 259.2761862957416},
+                },
+                {
+                    "score": 0.9964235424995422,
+                    "part": "leftHip",
+                    "position": {"x": 336.4056800218872, "y": 333.7291278740285},
+                },
+                {
+                    "score": 0.9797573685646057,
+                    "part": "rightHip",
+                    "position": {"x": 304.1603652419747, "y": 329.5813431023316},
+                },
+                {
+                    "score": 0.9982239603996277,
+                    "part": "leftKnee",
+                    "position": {"x": 234.82931055447472, "y": 321.737560212921},
+                },
+                {
+                    "score": 0.9412000179290771,
+                    "part": "rightKnee",
+                    "position": {"x": 230.1957874817607, "y": 361.4257559504534},
+                },
+                {
+                    "score": 0.9969828724861145,
+                    "part": "leftAnkle",
+                    "position": {"x": 293.0812636794747, "y": 431.44919598040804},
+                },
+                {
+                    "score": 0.9221053123474121,
+                    "part": "rightAnkle",
+                    "position": {"x": 261.4917847154669, "y": 430.4498006395725},
+                },
+            ],
+        }
+    if image_input_type == "test_woman_cat":
+        image = cv2.imread("test_images/flip_resize_woman_cat.png")
+        data = {
+            "score": 0.7363666725509307,
+            "keypoints": [
+                {
+                    "score": 0.8380802273750305,
+                    "part": "nose",
+                    "position": {"x": 179.38940144698444, "y": 254.11099923089378},
+                },
+                {
+                    "score": 0.7812063097953796,
+                    "part": "leftEye",
+                    "position": {"x": 165.23188609557394, "y": 230.79121802137306},
+                },
+                {
+                    "score": 0.37397244572639465,
+                    "part": "rightEye",
+                    "position": {"x": 166.26151355787937, "y": 248.4626224498057},
+                },
+                {
+                    "score": 0.9030696749687195,
+                    "part": "leftEar",
+                    "position": {"x": 153.7268588886187, "y": 219.59700352169688},
+                },
+                {
+                    "score": 0.2425304800271988,
+                    "part": "rightEar",
+                    "position": {"x": 173.5813434764105, "y": 173.1404896474255},
+                },
+                {
+                    "score": 0.9680370092391968,
+                    "part": "leftShoulder",
+                    "position": {"x": 221.16756216561285, "y": 159.55956651756802},
+                },
+                {
+                    "score": 0.9115365147590637,
+                    "part": "rightShoulder",
+                    "position": {"x": 211.35590193336577, "y": 161.46543828934585},
+                },
+                {
+                    "score": 0.9524546265602112,
+                    "part": "leftElbow",
+                    "position": {"x": 207.90895929596303, "y": 288.07423645968265},
+                },
+                {
+                    "score": 0.7065163850784302,
+                    "part": "rightElbow",
+                    "position": {"x": 194.80377553501947, "y": 277.7810336888763},
+                },
+                {
+                    "score": 0.9529217481613159,
+                    "part": "leftWrist",
+                    "position": {"x": 215.26783271522373, "y": 362.52704521534974},
+                },
+                {
+                    "score": 0.46546468138694763,
+                    "part": "rightWrist",
+                    "position": {"x": 169.4955693701362, "y": 337.1966331363342},
+                },
+                {
+                    "score": 0.9726027250289917,
+                    "part": "leftHip",
+                    "position": {"x": 402.53404669260703, "y": 178.47902920579662},
+                },
+                {
+                    "score": 0.8953964710235596,
+                    "part": "rightHip",
+                    "position": {"x": 350.03454067363816, "y": 190.68093097271696},
+                },
+                {
+                    "score": 0.9698488116264343,
+                    "part": "leftKnee",
+                    "position": {"x": 396.68759119649803, "y": 385.25891556023316},
+                },
+                {
+                    "score": 0.5270951986312866,
+                    "part": "rightKnee",
+                    "position": {"x": 403.1450252310311, "y": 359.03988220531085},
+                },
+                {
+                    "score": 0.694111168384552,
+                    "part": "leftAnkle",
+                    "position": {"x": 219.08159426678017, "y": 370.1622965916451},
+                },
+                {
+                    "score": 0.36338895559310913,
+                    "part": "rightAnkle",
+                    "position": {"x": 203.09534213886187, "y": 337.5737734779793},
+                },
+            ],
+        }
 
 newCheckBackLine(data, image)
