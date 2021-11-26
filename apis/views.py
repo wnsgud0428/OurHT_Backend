@@ -154,10 +154,10 @@ def getuserfeedback(request):
             # 변수 초기화
             save_data.clear()
 
-            if motion_index == 999:
+            if int(motion_index) == 999:
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
-                queryset = queryset[motion_index - 1]
+                queryset = queryset[int(motion_index) - 1]
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             return Response(serializer.data) 
 
