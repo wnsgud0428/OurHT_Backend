@@ -70,7 +70,7 @@ def createexercise(request):
     if request.method == "POST":
         userid = request.data["userid"]
         user = user_models.User.objects.get(id=userid)
-        create_exercise = exercise_models.Exercise.objects.create(user=user, type=1)
+        create_exercise = exercise_models.Exercise.objects.create(user=user, type="squat")
         return Response(create_exercise.pk)
 
 
