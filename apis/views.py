@@ -98,13 +98,10 @@ def getuserexercise(request):
         if not user:
             return Response("User Does Not Exist")
         else:
-            queryset = exercise_models.Exercise.objects.get(user=user.id)
-            if len(queryset) >= 2:
-                serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
-            else:
-                serializer = exercise_serializer.ExerciseSerializer(
-                    queryset, many=False
-                )
+            queryset = exercise_models.Exercise.objects.filter(user=user.id)
+            # 한 user가 가진 exercise모델이 여러개 있으니
+            # get이 아닌 filter로 해야 전부다 가져올수 있슴다.
+            serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
             return Response(serializer.data)
 
 
