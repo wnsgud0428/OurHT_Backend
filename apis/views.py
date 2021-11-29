@@ -13,6 +13,7 @@ from PIL import Image
 
 # Create your views here.
 
+
 @api_view(["GET"])
 # 주석 달기
 def getRoutes(request):
@@ -70,7 +71,9 @@ def createexercise(request):
     if request.method == "POST":
         userid = request.data["userid"]
         user = user_models.User.objects.get(id=userid)
-        create_exercise = exercise_models.Exercise.objects.create(user=user, type="squat")
+        create_exercise = exercise_models.Exercise.objects.create(
+            user=user, type="squat"
+        )
         return Response(create_exercise.pk)
 
 
@@ -108,6 +111,7 @@ def getuserexercise(request):
 # 'apis/users/getuserfeedback - 자세한 피드백을 위해 유저 피드백 내용(Motion 모델)을 들고와 웹에 뿌려주는 API
 save_data = []
 
+
 @api_view(["GET"])
 def getuserfeedback(request):
 
@@ -115,7 +119,7 @@ def getuserfeedback(request):
         exercise_pk = request.GET.get("exercise_pk")
         motion_index = request.GET.get("motion_index")
         print(exercise_pk, motion_index)
-        exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+        exercise = exercise_models.Exercise.objects.get(pk=exercise_pk)
 
         if not exercise:
             return Response("Exercise Does Not Exist")
@@ -132,10 +136,10 @@ def getuserfeedback(request):
                         f.write(temp)
                     f.close()
 
-                    im = Image.open('photos/test2.webp').convert('RGB')
-                    im.save('photos/test2.jpg', 'jpeg')
+                    im = Image.open("photos/test2.webp").convert("RGB")
+                    im.save("photos/test2.jpg", "jpeg")
 
-                    with open("photos/test2.jpg","rb") as f:
+                    with open("photos/test2.jpg", "rb") as f:
                         encode_str = base64.b64encode(f.read())
 
                     rmbg = util.NewRemoveBg("yLhTTo4uCPsYtMAyqFviYCKN", "error.log")
@@ -160,20 +164,20 @@ def getuserfeedback(request):
             else:
                 queryset = queryset[int(motion_index) - 1]
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
-            return Response(serializer.data) 
+            return Response(serializer.data)
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
 
-#pose_list = []
-#url_list = []
+# pose_list = []
+# url_list = []
 feedback_result = []
-#is_person_gone_to_stand = "no"
+# is_person_gone_to_stand = "no"
 
 
 @api_view(["POST"])
 def getjointpoint(request):
-    '''
+    """
     global is_person_gone_to_stand, count
     data = request.data["skeletonpoint"]
     image_url = request.data["url"]
@@ -217,7 +221,7 @@ def getjointpoint(request):
                         with open("photos/test.webp", "wb") as f:
                             f.write(temp)
                         f.close()
-                    
+
                         feedback_result.append(isUpperbodyNotBent(sampling_data))
                         feedback_result.append(
                             isFaceForward(sampling_data)
@@ -268,7 +272,7 @@ def getjointpoint(request):
             return Response("운동 진행 중")
         else:
             return Response("카메라 세팅 다시 하세요")
-    '''
+    """
     # 프론트와 분리한 새 버전
     print("Hello New Function")
     data = request.data["skeletonpoint"]
@@ -281,12 +285,12 @@ def getjointpoint(request):
     # f.close()
 
     feedback_result.append(feedback.isUpperbodyNotBent(data))
-    feedback_result.append(feedback.isFaceForward(data))  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+    feedback_result.append(
+        feedback.isFaceForward(data)
+    )  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
     feedback_result.append(feedback.checkRangeofmotion(data))
     feedback_result.append(feedback.checkKneeposition(data))
-    feedback_result.append(
-        feedback.checkCenterofgravity(data)
-    )  # 무게중심 깐깐함
+    feedback_result.append(feedback.checkCenterofgravity(data))  # 무게중심 깐깐함
     print("피드백 결과 : ", feedback_result)
 
     save_data.append(data)
@@ -294,7 +298,7 @@ def getjointpoint(request):
     # DB에 결과 저장
     print(request.data["exercise_pk"])
     exercise_pk = request.data["exercise_pk"]
-    exercise = exercise_models.Exercise.objects.get(pk = exercise_pk)
+    exercise = exercise_models.Exercise.objects.get(pk=exercise_pk)
     create_motion = exercise_models.Motion.objects.create(
         exercise=exercise, count_number=count, photo=image_data
     )
