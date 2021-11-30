@@ -32,6 +32,20 @@ def getRoutes(request):
     ]
     return Response(routes)
 
+# 'apis/users/register - 유저 회원가입 기능 처리 함수
+@api_view(["POST"])
+def register(request):
+    if request.method == "POST":
+        username = request.data["username"]
+        password = request.data["password"]
+
+        user = user_models.User.objects.filter(username=username)
+        if not user:
+            user = user_models.User.objects.create_user(username=username, password=password)
+            print(user.pk)
+            return Response(user.pk)
+        else:
+            return Response(-1)
 
 # 'apis/users/login' - 토큰 통해 유저 로그인 기능 처리 함수
 @api_view(["POST"])
@@ -50,19 +64,6 @@ def createexercise(request):
         user = user_models.User.objects.get(id=userid)
         create_exercise = exercise_models.Exercise.objects.create(user=user, type="squat")
         return Response(create_exercise.pk)
-
-
-# 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함 // 필요 없을 듯?
-@api_view(["POST"])
-def createmotion(request):
-    if request.method == "POST":
-        exercise_pk = request.data["exercisepk"]
-        count_number = request.data["countnumber"]
-        create_motion = exercise_models.Motion.objects.create(
-            exercise=exercise_pk, count_number=count_number, checklist=None, photo=None
-        )
-        return Response(create_motion.pk)
-
 
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])

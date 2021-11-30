@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
 
     # For authentiation with rest Framework
     "rest_auth",
+    "rest_auth.registration",
     "rest_framework.authtoken"
 ]
 
