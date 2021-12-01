@@ -128,10 +128,11 @@ def getuserfeedback(request):
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image_arr = cv2.imread("photos/no-bg.png", 1)
-                    image_arr = numpy.array(image_arr)
+                    # image_arr = numpy.array(image_arr) #이전 checkbackline함수 이용위함.
 
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
-                    backlineflag = feedback.checkbackline(save_data[i], image_arr)
+                    # backlineflag = feedback.checkbackline(save_data[i], image_arr)
+                    backlineflag = feedback.newCheckBackLine(save_data[i], image)
                     if backlineflag == True:
                         queryset[i].checklist.add(3)
                     # 바로 값이 바뀌나?

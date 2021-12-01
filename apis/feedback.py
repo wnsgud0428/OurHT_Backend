@@ -467,9 +467,9 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
     print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
     # 보여주는 부분
-    cv2.imshow("output_image", output_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("output_image", output_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     if hip_shoulder_slope_diff < 0.5:
         print("좋은 허리")
