@@ -479,6 +479,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
         return False
 
 
+###### 테스트 하기 위함
 image_input_type = "wrong"  ###이거를 good, wrong으로 바꿔가야 demo해보면 됨
 if image_input_type == "wrong":
     image = cv2.imread("test_images/resize_" + image_input_type + "2.jpg_removebg.png")
@@ -850,4 +851,4 @@ else:
             ],
         }
 
-newCheckBackLine(data, image)
+# newCheckBackLine(data, image)
