@@ -1,8 +1,6 @@
-import numpy
-import cv2
+import numpy, cv2
 from scipy.interpolate import splprep, splev
-
-import util
+# import util
 
 
 def isUpperbodyNotBent(data):
@@ -467,9 +465,9 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
     print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
     # 보여주는 부분
-    # cv2.imshow("output_image", output_image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("output_image", output_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     if hip_shoulder_slope_diff < 0.5:
         print("좋은 허리")
@@ -478,9 +476,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
         print("굽은 허리")
         return False
 
-
 ###### 테스트 하기 위함
-image_input_type = "wrong"  ###이거를 good, wrong으로 바꿔가야 demo해보면 됨
+image_input_type = "test_woman_cat"  ###이거를 good, wrong으로 바꿔가야 demo해보면 됨
 if image_input_type == "wrong":
     image = cv2.imread("test_images/resize_" + image_input_type + "2.jpg_removebg.png")
     data = {
@@ -851,4 +848,4 @@ else:
             ],
         }
 
-# newCheckBackLine(data, image)
+newCheckBackLine(data, image)
