@@ -1,6 +1,6 @@
 import numpy, cv2
 from scipy.interpolate import splprep, splev
-# import util
+import util
 
 
 def isUpperbodyNotBent(data):
@@ -317,7 +317,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
             ],
         )
     )
-    print(origin_left_shoulder)
+    #print(origin_left_shoulder)
 
     roi = {
         "x_begin": origin_left_shoulder[0],
@@ -379,7 +379,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     )
 
     line_equ_coef = returnLineEquCoef(left_shoulder, left_hip)
-    print(line_equ_coef)
+    #print(line_equ_coef)
 
     want_point_list = []
     for i in range(len(smoothened)):
@@ -395,14 +395,14 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
 
     slope_diff_sum = 0
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
-    print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
+    #print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
 
-    print(type(want_point_list))
+    #print(type(want_point_list))
     want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
-    print("want_point_list:", want_point_list)
+    #print("want_point_list:", want_point_list)
 
     # num_of_check_point = len(want_point_list)
     num_of_check_point = 7
@@ -460,20 +460,20 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     )
     shoulder_part_slope = coef1[0]
     hip_part_slope = coef2[0]
-    print("shoulder_part_slope:", shoulder_part_slope)
-    print("hip_part_slope:", hip_part_slope)
+    #print("shoulder_part_slope:", shoulder_part_slope)
+    #print("hip_part_slope:", hip_part_slope)
     hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
-    print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
+    #print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
     # 보여주는 부분
-    cv2.imshow("output_image", output_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("output_image", output_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     if hip_shoulder_slope_diff < 0.5:
-        print("좋은 허리")
+        #print("좋은 허리")
         return True
     else:
-        print("굽은 허리")
+        #print("굽은 허리")
         return False
 
 ###### 테스트 하기 위함
@@ -848,4 +848,4 @@ else:
             ],
         }
 
-newCheckBackLine(data, image)
+#newCheckBackLine(data, image)
