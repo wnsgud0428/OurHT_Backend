@@ -2,9 +2,16 @@ from django.contrib import admin
 from . import models
 
 
+class MotionInline(admin.TabularInline):
+
+    model = models.Motion
+
+
 @admin.register(models.Exercise)
 class ExerciseAdmin(admin.ModelAdmin):
     """Exercise Admin Definition"""
+
+    inlines = (MotionInline,)  # Exercise Admin에서 해당하는 Motion을 볼 수 있음
 
     list_display = (
         "pk",

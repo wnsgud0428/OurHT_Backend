@@ -84,9 +84,24 @@ def getuserexercise(request):
             return Response("User Does Not Exist")
         else:
             queryset = exercise_models.Exercise.objects.filter(user=user.id)
+            print(queryset.values()[0])  # queryset.values()하면 딕셔너리 형태로 리턴해준다!!!
+
+            # print(queryset2)
+
             # 한 user가 가진 exercise모델이 여러개 있으니
             # get이 아닌 filter로 해야 전부다 가져올수 있슴다.
             serializer = exercise_serializer.ExerciseSerializer(queryset, many=True)
+            for i in range(len(queryset)):
+                that_exercise_pk = queryset.values()[i]["id"]
+                queryset_for_motion = exercise_models.Motion.objects.filter(
+                    exercise=that_exercise_pk
+                )
+                squat_count = queryset_for_motion.count()
+                serializer.data[i]["squat_count"] = squat_count  # 여기서 값이 수정이 된다?!
+                print(squat_count)
+            print(type(serializer.data[0]), serializer.data[0])
+
+            # print(serializer.data)
             return Response(serializer.data)
 
 
