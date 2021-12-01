@@ -1,6 +1,7 @@
 import cv2, numpy, util, base64
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 from users import serializer as user_serializer
 from exercises import serializer as exercise_serializer
@@ -33,36 +34,32 @@ def getRoutes(request):
     return Response(routes)
 
 
-# 'apis/users/login' - 유저 로그인 기능 처리 함수
-@api_view(["GET", "POST"])
-def login(request):
-    # GET 요청 처리 ->
-    if request.method == "GET":
-        # data = request.data
-        pass
-
-    # POST 요청 처리
+# 'apis/users/register - 유저 회원가입 기능 처리 함수
+@api_view(["POST"])
+def register(request):
     if request.method == "POST":
-        data = request.data
-        pass
+        username = request.data["username"]
+        password = request.data["password"]
 
-    # 로그인 함수 로직 -> 위의 GET , POST 요청 고민해서 로직 넣어야함!
-    input_id = data["userid"]
-    input_password = data["userpassword"]
-    user = user_models.User.objects.filter(userid=input_id, userpassword=input_password)
-    user_2 = user_models.User.objects.filter(userid=input_id)
-    if not user and user_2:
-        # 아이디는 존재하나, 비밀번호 오류
-        print("비번 오류")
-    elif not user and not user_2:
-        # 로그인 실패
-        print("로그인 실패")
-    else:
-        # 로그인 성공
-        print("Success")
+        user = user_models.User.objects.filter(username=username)
+        if not user:
+            user = user_models.User.objects.create_user(
+                username=username, password=password
+            )
+            print(user.pk)
+            return Response(user.pk)
+        else:
+            return Response(-1)
 
-    # Response 응답 고민!
-    return Response("응답을 뭘 줄껀지도 고민")
+
+# 'apis/users/login' - 토큰 통해 유저 로그인 기능 처리 함수
+@api_view(["POST"])
+def login(request):
+    if request.method == "POST":
+        usertoken = request.data["usertoken"]
+        print(usertoken)
+        token = Token.objects.get(key=usertoken)
+        return Response(token.user.id)
 
 
 # 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
@@ -75,18 +72,6 @@ def createexercise(request):
             user=user, type="squat"
         )
         return Response(create_exercise.pk)
-
-
-# 'apis/users/createmotion' - Motion 모델 생성, 생성된 모델의 PK를 응답함 // 필요 없을 듯?
-@api_view(["POST"])
-def createmotion(request):
-    if request.method == "POST":
-        exercise_pk = request.data["exercisepk"]
-        count_number = request.data["countnumber"]
-        create_motion = exercise_models.Motion.objects.create(
-            exercise=exercise_pk, count_number=count_number, checklist=None, photo=None
-        )
-        return Response(create_motion.pk)
 
 
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
@@ -165,121 +150,17 @@ def getuserfeedback(request):
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
-
-# pose_list = []
-# url_list = []
 feedback_result = []
-# is_person_gone_to_stand = "no"
 
 
 @api_view(["POST"])
 def getjointpoint(request):
-    """
-    global is_person_gone_to_stand, count
-    data = request.data["skeletonpoint"]
-    image_url = request.data["url"]
 
-    if request.method == "POST":
-        # 카메라 세팅 체크
-        camSetFlag = isCameraSetted(data)
-        if camSetFlag == True:
-            # 현재 스쿼트 상태 체크
-            squat_state = returnSquatState(data)
-            # 스쿼트 상태인 경우, 샘플링을 위해 데이터 수집
-            if squat_state == "squat":
-                pose_list.append(data)
-                url_list.append(image_url)
-                is_person_gone_to_stand = "no"
-            else:
-                if squat_state == "stand":
-                    is_person_gone_to_stand = "yes"
-                # 스쿼트를 한번 한 후, 다시 일어난 경우
-                if is_person_gone_to_stand == "yes":
-                    # 스쿼트 사진 중에서, 가장 제대로 앉은 사진 샘플링하기
-                    pose_list_for_hip_y = []
-                    for p in pose_list:
-                        pose_list_for_hip_y.append(p["keypoints"][11]["position"]["y"])
-                    if pose_list_for_hip_y:
-                        max_hip_y = max(pose_list_for_hip_y)
-                        # 샘플링 할 사진 index 찾기, 이미지 url도 저장하기
-                        for i in range(len(pose_list_for_hip_y)):
-                            if max_hip_y == pose_list_for_hip_y[i]:
-                                max_hip_y_index = i
-
-                        # 사진 샘플링
-                        sampling_data = pose_list[max_hip_y_index]
-                        # 등 분석을 위해 관절 포인트 전역변수에 저장
-                        save_data.append(sampling_data)
-                        # URL 샘플링
-                        image_data = url_list[max_hip_y_index].replace(
-                            "data:image/webp;base64,", ""
-                        )
-                        temp = base64.b64decode(image_data)
-                        with open("photos/test.webp", "wb") as f:
-                            f.write(temp)
-                        f.close()
-
-                        feedback_result.append(isUpperbodyNotBent(sampling_data))
-                        feedback_result.append(
-                            isFaceForward(sampling_data)
-                        )  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
-                        feedback_result.append(feedback.checkRangeofmotion(sampling_data))
-                        feedback_result.append(feedback.checkKneeposition(sampling_data))
-                        feedback_result.append(
-                            feedback.checkCenterofgravity(sampling_data)
-                        )  # 무게중심 깐깐함
-                        print("피드백 결과 : ", feedback_result)
-
-                        # DB에 결과 저장
-                        # exercise_pk = request.data["exercisepk"]
-                        exercise = exercise_models.Exercise.objects.get(pk=5)
-                        create_motion = exercise_models.Motion.objects.create(
-                            exercise=exercise, count_number=count, photo=image_data
-                        )
-                        # 생성한 Motion 모델에 피드백 결과 checklist 넣기
-                        for i in range(len(feedback_result)):
-                            if feedback_result[i] == "True":
-                                create_motion.checklist.add(
-                                    exercise_models.Checklist.objects.get(pk=i)
-                                )
-                                create_motion.save()
-
-                        # 실시간 피드백을 위한 응답
-                        feedback_true_count = 0
-                        for f in feedback_result:
-                            if f == True:
-                                feedback_true_count += 1
-
-                        # 변수 초기화
-                        pose_list_for_hip_y.clear()
-                        pose_list.clear()
-                        url_list.clear()
-                        feedback_result.clear()
-                        count += 1
-
-                        print("결과 : ", count, feedback_true_count)
-                        if feedback_true_count >= 4:
-                            return Response("Perfect")
-                        elif feedback_true_count <= 1:
-                            return Response("Bad")
-                        else:
-                            return Response("Good")
-                else:
-                    pass
-            return Response("운동 진행 중")
-        else:
-            return Response("카메라 세팅 다시 하세요")
-    """
     # 프론트와 분리한 새 버전
     print("Hello New Function")
     data = request.data["skeletonpoint"]
     count = request.data["count"]
     image_data = request.data["url"].replace("data:image/webp;base64,", "")
-
-    # image_data = base64.b64decode(image_data)
-    # with open("photos/test.webp", "wb") as f:
-    #     f.write(image_data)
-    # f.close()
 
     feedback_result.append(feedback.isUpperbodyNotBent(data))
     feedback_result.append(

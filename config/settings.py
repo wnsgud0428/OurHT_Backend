@@ -44,6 +44,11 @@ THIRD_PARTY_APPS = [
     # For rest Framework
     "rest_framework",
     "corsheaders",
+
+    # For authentiation with rest Framework
+    "rest_auth",
+    "rest_auth.registration",
+    "rest_framework.authtoken"
 ]
 
 PROJECT_APPS = [
@@ -156,3 +161,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "medias")
 MEDIA_URL = "/medias/"
 # 실제 MEDIA 파일의 웹 상 URL 설정
 # 앞에있는 /은 절대경로로 만들어줌, 반드시 / 로 끝나야함!
+
+# DRF auth settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
+
+APPEND_SLASH=False

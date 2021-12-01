@@ -1,5 +1,7 @@
 Django==3.2.8
 djangorestframework==3.12.4
 django-cors-headers==3.10.0
+django-rest-auth
+django-allauth
 Pillow==8.4.0
 matplotlib==*

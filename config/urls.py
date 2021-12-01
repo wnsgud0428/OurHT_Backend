@@ -22,4 +22,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", TemplateView.as_view(template_name="index.html")),
     path("apis/", include("apis.urls")),
+
+    # 유저 기능 구현을 위한 api 주소들
+    path("rest-auth/", include('rest_auth.urls')),
+    
 ]

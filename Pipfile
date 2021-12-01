@@ -13,6 +13,8 @@ opencv-python = "*"
 matplotlib = "*"
 removebg = "*"
 scipy = "*"
+django-rest-auth = "*"
+django-allauth = "*"
 
 [dev-packages]
 black = "*"
