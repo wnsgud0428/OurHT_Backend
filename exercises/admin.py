@@ -5,7 +5,9 @@ from . import models
 @admin.register(models.Exercise)
 class ExerciseAdmin(admin.ModelAdmin):
     """Exercise Admin Definition"""
+
     list_display = (
+        "pk",
         "user",
         "type",
         "created",
@@ -27,10 +29,12 @@ class ExerciseAdmin(admin.ModelAdmin):
 @admin.register(models.Motion)
 class MotionAdmin(admin.ModelAdmin):
     """Motion Admin Definition"""
+
     list_display = (
-            "exercise",
-            "count_number",
-            "feedback_check",
+        "pk",
+        "exercise",
+        "count_number",
+        "feedback_check",
     )
 
     fieldsets = (
