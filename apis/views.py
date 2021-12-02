@@ -33,7 +33,6 @@ def getRoutes(request):
     ]
     return Response(routes)
 
-
 # 'apis/users/register - 유저 회원가입 기능 처리 함수
 @api_view(["POST"])
 def register(request):
@@ -51,7 +50,6 @@ def register(request):
         else:
             return Response(-1)
 
-
 # 'apis/users/login' - 토큰 통해 유저 로그인 기능 처리 함수
 @api_view(["POST"])
 def login(request):
@@ -61,6 +59,14 @@ def login(request):
         token = Token.objects.get(key=usertoken)
         return Response(token.user.id)
 
+# 'apis/users/getuserinfo' - User 정보 반환 API
+@api_view(["POST"])
+def getuserinfo(request):
+    if request.method == "POST":
+        userid = request.data["userid"]
+        user = user_models.User.objects.get(id=userid)
+        serializer = user_serializer.UserSerializer(user, many=False)
+        return Response(serializer.data)
 
 # 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
 @api_view(["POST"])
@@ -73,18 +79,17 @@ def createexercise(request):
         )
         return Response(create_exercise.pk)
 
-
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])
 def getuserexercise(request):
     if request.method == "GET":
-        username = request.GET.get("username")
-        user = user_models.User.objects.get(username=username)
+        userid = request.GET.get("userid")
+        user = user_models.User.objects.get(id=userid)
         if not user:
             return Response("User Does Not Exist")
         else:
             queryset = exercise_models.Exercise.objects.filter(user=user.id)
-            print(queryset.values()[0])  # queryset.values()하면 딕셔너리 형태로 리턴해준다!!!
+            #print(queryset.values()[0])  # queryset.values()하면 딕셔너리 형태로 리턴해준다!!!
 
             # print(queryset2)
 
@@ -98,8 +103,8 @@ def getuserexercise(request):
                 )
                 squat_count = queryset_for_motion.count()
                 serializer.data[i]["squat_count"] = squat_count  # 여기서 값이 수정이 된다?!
-                print(squat_count)
-            print(type(serializer.data[0]), serializer.data[0])
+                #print(squat_count)
+            #print(type(serializer.data[0]), serializer.data[0])
 
             # print(serializer.data)
             return Response(serializer.data)

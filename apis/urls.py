@@ -7,6 +7,7 @@ urlpatterns = [
     # User 관련 API
     path('users/register', views.register, name="register"),
     path('users/login', views.login, name="login"),
+    path('users/getuserinfo', views.getuserinfo, name="getuserinfo"),
     path('users/createexercise', views.createexercise, name="createexercise"),
     path('users/getuserexercise', views.getuserexercise, name="getuserexercise"),
     path('users/getuserfeedback', views.getuserfeedback, name="getuserfeedback"),
