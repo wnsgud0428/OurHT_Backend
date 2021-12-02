@@ -1,5 +1,6 @@
 import numpy, cv2
 from scipy.interpolate import splprep, splev
+import base64
 import util
 
 
@@ -317,7 +318,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
             ],
         )
     )
-    #print(origin_left_shoulder)
+    # print(origin_left_shoulder)
 
     roi = {
         "x_begin": origin_left_shoulder[0],
@@ -379,7 +380,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     )
 
     line_equ_coef = returnLineEquCoef(left_shoulder, left_hip)
-    #print(line_equ_coef)
+    # print(line_equ_coef)
 
     want_point_list = []
     for i in range(len(smoothened)):
@@ -395,17 +396,18 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
 
     slope_diff_sum = 0
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
-    #print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
+    # print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
 
-    #print(type(want_point_list))
+    # print(type(want_point_list))
     want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
-    #print("want_point_list:", want_point_list)
+    want_point_list.pop()
+    # print("want_point_list:", want_point_list)
 
     # num_of_check_point = len(want_point_list)
-    num_of_check_point = 7
+    # num_of_check_point = 7
 
     # 파란색으로 등 라인 그리기
     # for i in range(num_of_check_point - 1):
@@ -421,7 +423,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
 
     # 모든 점을 다 이용해서 검사하면 이상하게 됨
     # 어깨쪽에 있는 점들 위주로 이용해서 검사하는게 정확할듯
-    for i in range(num_of_check_point):
+    for i in range(len(want_point_list)):
+        # for i in range(num_of_check_point):
         # 파란색으로 등에있는 점 찍기
         cv2.line(
             image,
@@ -460,24 +463,32 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     )
     shoulder_part_slope = coef1[0]
     hip_part_slope = coef2[0]
-    #print("shoulder_part_slope:", shoulder_part_slope)
-    #print("hip_part_slope:", hip_part_slope)
+    print("shoulder_part_slope:", shoulder_part_slope)
+    print("hip_part_slope:", hip_part_slope)
     hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
-    #print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
+    print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
+
+    _, im_arr = cv2.imencode(".jpg", output_image)
+    im_bytes = im_arr.tobytes()
+    im_b64 = base64.b64encode(im_bytes)
+
+    back_image_base64 = im_b64
+
     # 보여주는 부분
-    # cv2.imshow("output_image", output_image)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow("output_image", output_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     if hip_shoulder_slope_diff < 0.5:
-        #print("좋은 허리")
-        return True
+        # print("좋은 허리")
+        return True, back_image_base64
     else:
-        #print("굽은 허리")
-        return False
+        # print("굽은 허리")
+        return False, back_image_base64
+
 
 ###### 테스트 하기 위함
-image_input_type = "test_woman_cat"  ###이거를 good, wrong으로 바꿔가야 demo해보면 됨
+image_input_type = "wrong"  ###이거를 good, wrong으로 바꿔가야 demo해보면 됨
 if image_input_type == "wrong":
     image = cv2.imread("test_images/resize_" + image_input_type + "2.jpg_removebg.png")
     data = {
@@ -848,4 +859,4 @@ else:
             ],
         }
 
-#newCheckBackLine(data, image)
+# newCheckBackLine(data, image)

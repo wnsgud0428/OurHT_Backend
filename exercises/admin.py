@@ -42,6 +42,10 @@ class MotionAdmin(admin.ModelAdmin):
         "exercise",
         "count_number",
         "feedback_check",
+        "shoulder_x",
+        "shoulder_y",
+        "hip_x",
+        "hip_y",
     )
 
     fieldsets = (
@@ -53,7 +57,12 @@ class MotionAdmin(admin.ModelAdmin):
                     "count_number",
                     "checklist",
                     "photo",
+                    "photo_back_checked",
                     "feedback_check",
+                    "shoulder_x",
+                    "shoulder_y",
+                    "hip_x",
+                    "hip_y",
                 ),
             },
         ),

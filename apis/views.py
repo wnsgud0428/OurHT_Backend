@@ -139,7 +139,7 @@ def getuserfeedback(request):
                     with open("photos/test2.jpg", "rb") as f:
                         encode_str = base64.b64encode(f.read())
 
-                    rmbg = util.NewRemoveBg("yLhTTo4uCPsYtMAyqFviYCKN", "error.log")
+                    rmbg = util.NewRemoveBg("J8XPR73KhtfXdm6Djr1CU16h", "error.log")
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image = cv2.imread("photos/no-bg.png", 1)
@@ -147,7 +147,10 @@ def getuserfeedback(request):
 
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
                     # backlineflag = feedback.checkbackline(save_data[i], image_arr)
-                    backlineflag = feedback.newCheckBackLine(save_data[i], image)
+                    backlineflag, back_image_base64 = feedback.newCheckBackLine(
+                        save_data[i], image
+                    )
+                    queryset[i].photo_back_checked = back_image_base64
                     if backlineflag == True:
                         queryset[i].checklist.add(6)
                     # 바로 값이 바뀌나?
@@ -193,8 +196,15 @@ def getjointpoint(request):
     print(request.data["exercise_pk"])
     exercise_pk = request.data["exercise_pk"]
     exercise = exercise_models.Exercise.objects.get(pk=exercise_pk)
+
     create_motion = exercise_models.Motion.objects.create(
-        exercise=exercise, count_number=count, photo=image_data
+        exercise=exercise,
+        count_number=count,
+        photo=image_data,
+        shoulder_x=data["keypoints"][5]["position"]["x"],
+        shoulder_y=data["keypoints"][5]["position"]["y"],
+        hip_x=data["keypoints"][11]["position"]["x"],
+        hip_y=data["keypoints"][11]["position"]["y"],
     )
 
     # 생성한 Motion 모델에 피드백 결과 checklist 넣기
