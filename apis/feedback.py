@@ -403,11 +403,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
-    want_point_list.pop()
+    want_point_list.pop()  # want_point_list 정리 (엉덩이쪽 포인트 없애는게 나음)
     # print("want_point_list:", want_point_list)
-
-    # num_of_check_point = len(want_point_list)
-    # num_of_check_point = 7
 
     # 파란색으로 등 라인 그리기
     # for i in range(num_of_check_point - 1):
@@ -423,7 +420,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
 
     # 모든 점을 다 이용해서 검사하면 이상하게 됨
     # 어깨쪽에 있는 점들 위주로 이용해서 검사하는게 정확할듯
-    for i in range(len(want_point_list)):
+    num_of_check_point = len(want_point_list)
+    for i in range(num_of_check_point):
         # for i in range(num_of_check_point):
         # 파란색으로 등에있는 점 찍기
         cv2.line(
