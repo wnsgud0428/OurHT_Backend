@@ -15,7 +15,7 @@ class Exercise(models.Model):
     )
 
     user = models.ForeignKey(
-        "users.User", related_name="exercises", on_delete=models.CASCADE, ngitull=True
+        "users.User", related_name="exercises", on_delete=models.CASCADE, null=True
     )
     type = models.CharField(choices=TYPE_CHOICES, max_length=20, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
