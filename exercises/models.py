@@ -18,7 +18,7 @@ class Exercise(models.Model):
         "users.User", related_name="exercises", on_delete=models.CASCADE, null=True
     )
     type = models.CharField(choices=TYPE_CHOICES, max_length=20, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=False, null=True, editable=True)
+    created = models.DateTimeField(auto_now_add=True, null=True, editable=True)
     # 원래는 auto_now_add를 True로 해야됨.
     # admin페이지에서 add하여 테스트하기 위해 False로 해놓음.
 

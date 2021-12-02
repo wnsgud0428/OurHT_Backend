@@ -280,6 +280,9 @@ def returnLineEquCoef(p1, p2):
     if x2 != x1:
         m = (y2 - y1) / (x2 - x1)  # 기울기 m 계산(a값)
         n = y1 - (m * x1)  # y 절편 계산(b값)
+    else:
+        m = 100
+        n = y1 - (m * x1)
     return [m, n]
 
 
@@ -398,7 +401,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
     # print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
 
-    #print(type(want_point_list))
+    # print(type(want_point_list))
     # print(type(want_point_list))
     want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
     want_point_list = list(map(list, want_point_list))  # 중복제거..
