@@ -26,7 +26,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 media/
-test_images/
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -143,3 +143,7 @@ cython_debug/
 .DS_Store
 uploads/
 node_modules
+
+# 이미지 파일들
+test_images/
+photos/

@@ -18,7 +18,7 @@ class Exercise(models.Model):
         "users.User", related_name="exercises", on_delete=models.CASCADE, null=True
     )
     type = models.CharField(choices=TYPE_CHOICES, max_length=20, null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True, null=True)
+    created = models.DateTimeField(auto_now_add=False, null=True, editable=True)
     # 원래는 auto_now_add를 True로 해야됨.
     # admin페이지에서 add하여 테스트하기 위해 False로 해놓음.
 
@@ -35,7 +35,12 @@ class Motion(models.Model):
         "Checklist", related_name="exercises", blank=True
     )
     photo = models.CharField(max_length=100000, null=True)
+    photo_back_checked = models.CharField(max_length=100000, null=True)
     feedback_check = models.BooleanField(default=False)
+    shoulder_x = models.FloatField(null=True)
+    shoulder_y = models.FloatField(null=True)
+    hip_x = models.FloatField(null=True)
+    hip_y = models.FloatField(null=True)
 
     def __str__(self):
         return f"{self.exercise} - {self.count_number}"
