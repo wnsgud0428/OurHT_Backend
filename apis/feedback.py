@@ -391,18 +391,20 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
                     want_point_list.append(point)
 
     # print((smoothened[0][0][0]))
-    # print(smoothened[1])
+    print(smoothened[0])
 
     slope_diff_sum = 0
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
     #print("shoulder_to_hip_slope:", shoulder_to_hip_slope)
+
+    print("want_point_list:", want_point_list)
 
     #print(type(want_point_list))
     want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
-    #print("want_point_list:", want_point_list)
+    print("want_point_list:", want_point_list)
 
     # num_of_check_point = len(want_point_list)
     num_of_check_point = 7
