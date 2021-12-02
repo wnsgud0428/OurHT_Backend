@@ -68,6 +68,23 @@ def getuserinfo(request):
         serializer = user_serializer.UserSerializer(user, many=False)
         return Response(serializer.data)
 
+# 'apis/users/updateuserinfo' - User 정보 수정 API
+@api_view(["POST"])
+def updateuserinfo(request):
+    if request.method == "POST":
+        userid = request.data["userid"]
+        user = user_models.User.objects.get(id=userid)
+
+        userage = request.data["userage"]
+        userheight = request.data["userheight"]
+        userweight = request.data["userweight"]
+
+        user.age = userage
+        user.height = userheight
+        user.weight = userweight
+        user.save()
+        return Response("유저 저장 완료!")
+        
 # 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
 @api_view(["POST"])
 def createexercise(request):
