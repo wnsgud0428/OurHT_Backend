@@ -395,7 +395,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
                     want_point_list.append(point)
 
     # print((smoothened[0][0][0]))
-    print(smoothened[0])
+    # print(smoothened[0])
 
     slope_diff_sum = 0
     shoulder_to_hip_slope = returnLineEquCoef(left_shoulder, left_hip)[0]
