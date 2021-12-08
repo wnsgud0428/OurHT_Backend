@@ -69,18 +69,18 @@ def isFaceForward(data):
     ear_nose_extra_angle = 0
 
     if returnPersonFaceDirection(data) == "right face is front":
-        print("right face is front")  # test
+        # print("right face is front")  # test
         ear_nose_extra_angle = util.calculate_angle(
             right_ear, nose, [right_ear_x, nose_y]
         )
     elif returnPersonFaceDirection(data) == "left face is front":
-        print("left face is front")  # test
+        # print("left face is front")  # test
         ear_nose_extra_angle = util.calculate_angle(
             left_ear, nose, [left_ear_x, nose_y]
         )
 
-    print(ear_nose_extra_angle)  # test
-    if ear_nose_extra_angle < 40:  # todo: 값 수정
+    #print(ear_nose_extra_angle) 
+    if ear_nose_extra_angle < 40: 
         is_face_forward = True
 
     if is_face_forward == True:
@@ -268,7 +268,6 @@ def checkbackline(data, image):
     else:
         return True
 
-    # 2. 곡률 데이터를 통해 굽었는지 판정하기 - 곡률이 제대로 측정되지 않아서 보류
 
 
 def returnLineEquCoef(p1, p2):

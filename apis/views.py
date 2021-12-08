@@ -197,7 +197,6 @@ feedback_result = []
 @api_view(["POST"])
 def getjointpoint(request):
 
-    # 프론트와 분리한 새 버전
     print("Hello New Function")
     data = request.data["skeletonpoint"]
     count = request.data["count"]
@@ -206,7 +205,7 @@ def getjointpoint(request):
     feedback_result.append(feedback.isUpperbodyNotBent(data))
     feedback_result.append(
         feedback.isFaceForward(data)
-    )  # 수정 필요, 각도가 크게 안바뀜, 왼오른쪽 방향도 중요
+    )
     feedback_result.append(feedback.checkRangeofmotion(data))
     feedback_result.append(feedback.checkKneeposition(data))
     feedback_result.append(feedback.checkCenterofgravity(data))  # 무게중심 깐깐함
