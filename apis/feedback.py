@@ -349,7 +349,7 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
         # https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.interpolate.splprep.html
         tck, u = splprep([x, y], u=None, s=1.0, per=1)
         # https://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linspace.html
-        u_new = numpy.linspace(u.min(), u.max(), 20)
+        u_new = numpy.linspace(u.min(), u.max(), 30)
         # https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.interpolate.splev.html
         x_new, y_new = splev(u_new, tck, der=0)
         # Convert it back to numpy format for opencv to be able to display it
@@ -388,6 +388,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
+    if not want_point_list:
+        return False, None
     ### 여러번 테스트해서 앞뒤 포인트들 얼마나 짤라낼지 정해야됨.
     # 앞에꺼 날리기
     want_point_list.pop(0)
