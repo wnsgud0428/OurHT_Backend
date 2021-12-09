@@ -55,7 +55,7 @@ def isFaceForward(data):
     ear_eye_extra_angle = util.calculate_angle(left_ear, left_eye, extra_point)
 
     print("[2](고개) ear_eye_extra_angle: ", ear_eye_extra_angle)
-    if ear_eye_extra_angle > 50:  # 값이 90에 가까워 질수록 땅을 바라봄(안좋은 자세 됨)
+    if ear_eye_extra_angle > 40:  # 값이 90에 가까워 질수록 땅을 바라봄(안좋은 자세 됨)
         is_face_forward = False
         print("[2]X")
     else:
