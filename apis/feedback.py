@@ -5,7 +5,7 @@ import base64
 import util
 
 
-def isUpperbodyNotBent(data):
+def isUpperbodyNotTooForward(data):
     is_upperbody_not_bent = False
 
     left_shoulder_x = data["keypoints"][5]["position"]["x"]
@@ -24,14 +24,14 @@ def isUpperbodyNotBent(data):
     shoulder_hip_extra_angle = util.calculate_angle(
         left_shoulder, left_hip, extra_point
     )
-    print("shoulder_hip_extra_angle: ", shoulder_hip_extra_angle)
+    print("[1](상체 숙여짐)shoulder_hip_extra_angle: ", shoulder_hip_extra_angle)
 
-    if shoulder_hip_extra_angle < 30:  # 0에 가까워질수록 지면과 수평(안 좋아짐)
+    if shoulder_hip_extra_angle < 40:  # 0에 가까워질수록 지면과 수평(안 좋아짐)
         is_upperbody_not_bent = False
-        print("[1] 상체 너무 숙여짐")
+        print("[1]X")
     else:
         is_upperbody_not_bent = True
-        print("[1] 상체 숙여짐 정도 ㄱㅊ")
+        print("[1]O")
 
     if is_upperbody_not_bent == True:
         return True
@@ -54,13 +54,13 @@ def isFaceForward(data):
 
     ear_eye_extra_angle = util.calculate_angle(left_ear, left_eye, extra_point)
 
-    print("ear_eye_extra_angle: ", ear_eye_extra_angle)
+    print("[2](고개) ear_eye_extra_angle: ", ear_eye_extra_angle)
     if ear_eye_extra_angle > 50:  # 값이 90에 가까워 질수록 땅을 바라봄(안좋은 자세 됨)
         is_face_forward = False
-        print("[2] 너무 아래를 쳐다봄")
+        print("[2]X")
     else:
         is_face_forward = True
-        print("[2] 적당한 고개")
+        print("[2]O")
 
     if is_face_forward == True:
         return True
@@ -68,183 +68,79 @@ def isFaceForward(data):
         return False
 
 
-def returnPersonFaceDirection(data):
-    """사람이 어느쪽으로 서있는지 return함"""
-    left_eye_x = data["keypoints"][1]["position"]["x"]
-    right_eye_x = data["keypoints"][2]["position"]["x"]
-    nose_x = data["keypoints"][0]["position"]["x"]
-
-    if left_eye_x < nose_x and right_eye_x < nose_x:
-        return "right face is front"
-    else:
-        return "left face is front"
-
-
-def checkRangeofmotion(data):
+def isRangeGood(data):
     # 좌표 받아오기
-    left_waist = data["keypoints"][11]["position"]
-    right_waist = data["keypoints"][12]["position"]
-    left_knee = data["keypoints"][13]["position"]
-    right_knee = data["keypoints"][14]["position"]
-    left_ankle = data["keypoints"][15]["position"]
-    right_ankle = data["keypoints"][16]["position"]
+    left_hip_x = data["keypoints"][11]["position"]["x"]
+    left_hip_y = data["keypoints"][11]["position"]["y"]
+    left_knee_x = data["keypoints"][13]["position"]["x"]
+    left_knee_y = data["keypoints"][13]["position"]["y"]
 
     # 관절 좌, 우 중심점 찾기
-    waist = [
-        (left_waist["x"] + right_waist["x"]) / 2,
-        (left_waist["y"] + right_waist["y"]) / 2,
-    ]
-    knee = [
-        (left_knee["x"] + right_knee["x"]) / 2,
-        (left_knee["y"] + right_knee["y"]) / 2,
-    ]
-    ankle = [
-        (left_ankle["x"] + right_ankle["x"]) / 2,
-        (left_ankle["y"] + right_ankle["y"]) / 2,
-    ]
+    left_hip = [left_hip_x, left_hip_y]
+    left_knee = [left_knee_x, left_knee_y]
+    extra_point = [left_hip_x, left_knee_y]
 
-    # 골반 - 무릎의 직선 기울기 찾기
-    waist_to_knee_slope = util.find_straightslope(waist[0], waist[1], knee[0], knee[1])
+    hip_knee_extra_angle = util.calculate_angle(left_hip, left_knee, extra_point)
 
-    # 골반 - 무릎 - 발목 각도 찾기
-    between_degree = util.calculate_angle(waist, knee, ankle)
-
-    # 최종 자세판단
-    if numpy.abs(waist_to_knee_slope) < 5:
-        if 50 < between_degree < 90:
-            print("1-2: 가동범위 굿")
+    print("[3](가동범위) hip_knee_extra_angle: ", hip_knee_extra_angle)
+    if left_hip_y > left_knee_y:
+        print("[3]O")
+        return True
+    else:
+        if hip_knee_extra_angle < 20:  # 덜 앉았을 경우에도 스쿼트로 인식하게 만들기
+            print("[3]△")
             return True
         else:
+            print("[3]X")
             return False
-    elif numpy.abs(waist_to_knee_slope) > 5 and numpy.abs(waist_to_knee_slope) < 50:
+
+
+def isKneePositionGood(data):
+    left_knee_x = data["keypoints"][13]["position"]["x"]
+    left_knee_y = data["keypoints"][13]["position"]["y"]
+
+    left_ankle_x = data["keypoints"][15]["position"]["x"]
+    left_ankle_y = data["keypoints"][15]["position"]["y"]
+
+    left_knee = [left_knee_x, left_knee_y]
+    left_ankle = [left_ankle_x, left_ankle_y]
+    extra_point = [left_knee_x, left_ankle_y]
+
+    knee_ankle_extra_angle = util.calculate_angle(left_knee, left_ankle, extra_point)
+
+    print("[4](무릎 튀어나옴) knee_ankle_extra_angle: ", knee_ankle_extra_angle)
+    if knee_ankle_extra_angle < 50:
+        print("[4]X")
         return False
     else:
-        return False
+        print("[4]O")
+        return True
 
 
-def checkKneeposition(data):
+def isCenterOfGravityProper(data):
     # 좌표 받아오기
-    left_waist = data["keypoints"][11]["position"]
-    right_waist = data["keypoints"][12]["position"]
-    left_knee = data["keypoints"][13]["position"]
-    right_knee = data["keypoints"][14]["position"]
-    left_ankle = data["keypoints"][15]["position"]
-    right_ankle = data["keypoints"][16]["position"]
+    left_shoulder_x = data["keypoints"][5]["position"]["x"]
+    left_shoulder_y = data["keypoints"][5]["position"]["y"]
 
-    # 관절 좌, 우 중심점 찾기
-    waist = [
-        (left_waist["x"] + right_waist["x"]) / 2,
-        (left_waist["y"] + right_waist["y"]) / 2,
-    ]
-    knee = [
-        (left_knee["x"] + right_knee["x"]) / 2,
-        (left_knee["y"] + right_knee["y"]) / 2,
-    ]
-    ankle = [
-        (left_ankle["x"] + right_ankle["x"]) / 2,
-        (left_ankle["y"] + right_ankle["y"]) / 2,
-    ]
+    left_ankle_x = data["keypoints"][15]["position"]["x"]
+    left_ankle_y = data["keypoints"][15]["position"]["y"]
 
-    # 골반 - 무릎의 직선 기울기 / 각도 찾기
-    waist_to_knee_slope = util.find_straightslope(waist[0], waist[1], knee[0], knee[1])
+    left_shoulder = [left_shoulder_x, left_shoulder_y]
+    left_ankle = [left_ankle_x, left_ankle_y]
+    extra_point = [left_shoulder_x, left_ankle_y]
 
-    if waist_to_knee_slope > 0:
-        waist_to_knee_degree = util.calculate_angle(
-            [1, waist_to_knee_slope], [0, 0], [1, 0]
-        )
-    else:
-        waist_to_knee_degree = util.calculate_angle(
-            [-1, waist_to_knee_slope], [0, 0], [-1, 0]
-        )
+    shoulder_ankle_extra_angle = util.calculate_angle(
+        left_shoulder, left_ankle, extra_point
+    )
 
-    # 무릎 - 발목의 직선 기울기 / 각도 찾기
-    knee_to_ankle_slope = util.find_straightslope(knee[0], knee[1], ankle[0], ankle[1])
-
-    if knee_to_ankle_slope > 0:
-        knee_to_ankle_degree = util.calculate_angle(
-            [1, knee_to_ankle_slope], [0, 0], [1, 0]
-        )
-    else:
-        knee_to_ankle_degree = util.calculate_angle(
-            [-1, knee_to_ankle_slope], [0, 0], [-1, 0]
-        )
+    print("[5](무게중심) shoulder_ankle_extra_angle: ", shoulder_ankle_extra_angle)
 
     # 최종 판단
-    if waist_to_knee_degree < 10 and knee_to_ankle_degree > 45:
-        print("2-1: 무릎이 적당하게 나감")
-        return True
-    else:
-        return False
-
-
-def checkCenterofgravity(data):
-    # 좌표 받아오기
-    left_shoulder = data["keypoints"][5]["position"]
-    right_shoulder = data["keypoints"][6]["position"]
-    left_knee = data["keypoints"][13]["position"]
-    right_knee = data["keypoints"][14]["position"]
-    left_ankle = data["keypoints"][15]["position"]
-    right_ankle = data["keypoints"][16]["position"]
-
-    # 관절 좌, 우 중심점 찾기
-    shoulder = [
-        (left_shoulder["x"] + right_shoulder["x"]) / 2,
-        (left_shoulder["y"] + right_shoulder["y"]) / 2,
-    ]
-    knee = [
-        (left_knee["x"] + right_knee["x"]) / 2,
-        (left_knee["y"] + right_knee["y"]) / 2,
-    ]
-    ankle = [
-        (left_ankle["x"] + right_ankle["x"]) / 2,
-        (left_ankle["y"] + right_ankle["y"]) / 2,
-    ]
-
-    # 어깨가 무릎보다 과도하게 앞으로 나오면 무게중심이 너무 앞으로 쏠린 경우임
-    if numpy.abs(shoulder[0] - knee[0]) > 50:
-        return False
-    # 어깨와 발목이 비슷한 좌표 포인트에서 움직이는지 판단!
-    diff = numpy.abs(shoulder[0] - ankle[0])
-    if diff < 50:
-        print("2-2: 무게중심 적절함")
-        return True
-    else:
-        return False
-
-
-def checkbackline(data, image):
-    # 관절 좌표 처리
-    left_shoulder = data["keypoints"][5]["position"]
-    right_shoulder = data["keypoints"][6]["position"]
-    left_waist = data["keypoints"][11]["position"]
-    right_waist = data["keypoints"][12]["position"]
-
-    # 관절 좌, 우 중심점 찾기
-    shoulder = [
-        (left_shoulder["x"] + right_shoulder["x"]) / 2,
-        (left_shoulder["y"] + right_shoulder["y"]) / 2,
-    ]
-    waist = [
-        (left_waist["x"] + right_waist["x"]) / 2,
-        (left_waist["y"] + right_waist["y"]) / 2,
-    ]
-
-    # 이미지와 관절 좌표 이용하여, 등 경계선과의 거리 측정하기
-    slope = util.find_straightslope(shoulder[0], shoulder[1], waist[0], waist[1])
-    if shoulder[0] < waist[0]:
-        distance = util.find_distancefromboarderline(
-            image, slope, int(shoulder[0]), int(shoulder[1]), int(waist[0])
-        )
-    else:
-        distance = util.find_distancefromboarderline(
-            image, slope, int(waist[0]), int(waist[1]), int(shoulder[0])
-        )
-
-    print("거리의 최대 차이 : ", max(distance), min(distance))
-    diff = max(distance) - min(distance)
-    if diff > 20:
+    if shoulder_ankle_extra_angle < 70:
+        print("[5]X")
         return False
     else:
+        print("[5]O")
         return True
 
 
@@ -383,22 +279,35 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
                     want_point_list.append(point)
     # print(want_point_list)
 
+    # 예외처리
+    if not want_point_list:
+        return False, None
+
     # want_point_list의 포인트들 정리
     want_point_list = list(set(map(tuple, want_point_list)))  # 중복제거..
     want_point_list = list(map(list, want_point_list))  # 중복제거..
     want_point_list.sort(key=lambda x: x[0])  # x좌표에 대해 오름차순으로 정렬
 
-    if not want_point_list:
-        return False, None
+    ### 굽은거 측정을 잘 못해냄
+    # want_to_remove = []
+    # for i in range(len(want_point_list)):
+    #     if want_point_list[i][1] <= left_shoulder[1]:
+    #         want_to_remove.append(i)
+    # want_to_remove.reverse()
+    # for i in want_to_remove:
+    #     want_point_list.pop(i)
+
     ### 여러번 테스트해서 앞뒤 포인트들 얼마나 짤라낼지 정해야됨.
+    ### !!!!!!!! 그날 컨디션에 따라 값날리는 거 달라야됨.
     # 앞에꺼 날리기
+    want_point_list.pop(0)
     want_point_list.pop(0)
     want_point_list.pop(0)
 
     # 뒤에꺼 날리기
     want_point_list.pop()
     want_point_list.pop()
-
+    print("want_point_list:", want_point_list)
     # print("필터링된 want_point_list:", want_point_list)
 
     # # 파란색으로 등 라인 그리기
@@ -460,6 +369,20 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     hip_shoulder_slope_diff = abs(hip_part_slope - shoulder_part_slope)
     print("어깨쪽 기울기와 골반쪽 기울기의 차이: ", hip_shoulder_slope_diff)
 
+    ###새로운 접근 -> 각도 이용
+    ##준비물: 아래 주석
+    # want_point_list[0], want_point_list[1]
+    # want_point_list[num_of_check_point - 2], want_point_list[num_of_check_point - 1]
+    x_move = want_point_list[num_of_check_point - 2][0] - want_point_list[1][0]
+    y_move = want_point_list[num_of_check_point - 2][1] - want_point_list[1][1]
+    moved_point = [want_point_list[0][0] + x_move, want_point_list[0][1] + y_move]
+    angle_for_slope_diff = util.calculate_angle(
+        moved_point,
+        want_point_list[num_of_check_point - 2],
+        want_point_list[num_of_check_point - 1],
+    )
+    print("angle_for_slope_diff: ", angle_for_slope_diff)
+
     # interpolated contour, 등 포인트 모두 그려진 이미지 base64코드로 저장
     _, im_arr = cv2.imencode(".jpg", output_image)
     im_bytes = im_arr.tobytes()
@@ -475,7 +398,8 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 
-    if hip_shoulder_slope_diff < 0.5:
+    # if hip_shoulder_slope_diff < 0.5: # 기울기이용
+    if angle_for_slope_diff > 165:
         # print("좋은 허리")
         return True, back_image_base64
     else:

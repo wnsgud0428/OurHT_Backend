@@ -134,14 +134,9 @@ def getuserexercise(request):
 
 
 # 'apis/users/getuserfeedback - 자세한 피드백을 위해 유저 피드백 내용(Motion 모델)을 들고와 웹에 뿌려주는 API
-# save_data = []
-
-
 @api_view(["GET"])
 def getuserfeedback(request):
-
     if request.method == "GET":
-        # try:
         exercise_pk = request.GET.get("exercise_pk")
         motion_index = request.GET.get("motion_index")
         print(exercise_pk, motion_index)
@@ -168,7 +163,7 @@ def getuserfeedback(request):
                     with open("photos/test2.jpg", "rb") as f:
                         encode_str = base64.b64encode(f.read())
 
-                    rmbg = util.NewRemoveBg("m7VxEF39XJX3wQWBRH6XFAKJ", "error.log")
+                    rmbg = util.NewRemoveBg("MzxLtGqDxLQhysscQsHS2jhR", "error.log")
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image = cv2.imread("photos/no-bg.png", 1)
@@ -194,17 +189,12 @@ def getuserfeedback(request):
                     queryset[i].feedback_check = True
                     queryset[i].save()
 
-            # 변수 초기화
-            # save_data.clear()
-
             if motion_index == "999":
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
             else:
                 queryset = queryset[int(motion_index) - 1]
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             return Response(serializer.data)
-    # except ValueError:
-    #     pass
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
@@ -217,16 +207,15 @@ def getjointpoint(request):
     print("Hello New Function")
     data = request.data["skeletonpoint"]
     count = request.data["count"]
+    print("count:", count)
     image_data = request.data["url"].replace("data:image/webp;base64,", "")
 
-    feedback_result.append(feedback.isUpperbodyNotBent(data))
+    feedback_result.append(feedback.isUpperbodyNotTooForward(data))
     feedback_result.append(feedback.isFaceForward(data))
-    feedback_result.append(feedback.checkRangeofmotion(data))
-    feedback_result.append(feedback.checkKneeposition(data))
-    feedback_result.append(feedback.checkCenterofgravity(data))  # 무게중심 깐깐함
+    feedback_result.append(feedback.isRangeGood(data))
+    feedback_result.append(feedback.isKneePositionGood(data))
+    feedback_result.append(feedback.isCenterOfGravityProper(data))
     print("피드백 결과 : ", feedback_result)
-
-    # save_data.append(data)
 
     # DB에 결과 저장
     print(request.data["exercise_pk"])
