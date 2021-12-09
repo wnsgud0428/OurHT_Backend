@@ -283,24 +283,27 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     image = cv2.resize(image, dsize=(640, 480), interpolation=cv2.INTER_AREA)
 
     # json으로 받아진 관절포인트에서 origin_left_shoulder 뽑아냄
-    origin_left_shoulder = list(
-        map(
-            int,
-            [
-                data["keypoints"][5]["position"]["x"],
-                data["keypoints"][5]["position"]["y"],
-            ],
-        )
-    )
-    origin_left_hip = list(
-        map(
-            int,
-            [
-                data["keypoints"][11]["position"]["x"],
-                data["keypoints"][11]["position"]["y"],
-            ],
-        )
-    )
+    # origin_left_shoulder = list(
+    #     map(
+    #         int,
+    #         [
+    #             data["keypoints"][5]["position"]["x"],
+    #             data["keypoints"][5]["position"]["y"],
+    #         ],
+    #     )
+    # )
+    # origin_left_hip = list(
+    #     map(
+    #         int,
+    #         [
+    #             data["keypoints"][11]["position"]["x"],
+    #             data["keypoints"][11]["position"]["y"],
+    #         ],
+    #     )
+    # )
+
+    origin_left_shoulder = list(map(int, [data[0], data[1]]))
+    origin_left_hip = list(map(int, [data[2], data[3]]))
 
     # 앞에서의 어깨, 골반 포인트를 이용해 1차 ROI 설정
     roi = {

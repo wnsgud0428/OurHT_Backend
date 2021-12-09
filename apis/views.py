@@ -134,13 +134,14 @@ def getuserexercise(request):
 
 
 # 'apis/users/getuserfeedback - 자세한 피드백을 위해 유저 피드백 내용(Motion 모델)을 들고와 웹에 뿌려주는 API
-save_data = []
+# save_data = []
 
 
 @api_view(["GET"])
 def getuserfeedback(request):
 
     if request.method == "GET":
+        # try:
         exercise_pk = request.GET.get("exercise_pk")
         motion_index = request.GET.get("motion_index")
         print(exercise_pk, motion_index)
@@ -173,10 +174,18 @@ def getuserfeedback(request):
                     image = cv2.imread("photos/no-bg.png", 1)
                     # image_arr = numpy.array(image_arr) #이전 checkbackline함수 이용위함.
 
+                    print(queryset[i].shoulder_x)
+                    shoulder_hip_data = [
+                        queryset[i].shoulder_x,
+                        queryset[i].shoulder_y,
+                        queryset[i].hip_x,
+                        queryset[i].hip_y,
+                    ]
+
                     # 등 분석 함수 진행, 관절 포인트는 전역 변수 - save_data 배열로 받아옴
                     # backlineflag = feedback.checkbackline(save_data[i], image_arr)
                     backlineflag, back_image_base64 = feedback.newCheckBackLine(
-                        save_data[i], image
+                        shoulder_hip_data, image
                     )
                     queryset[i].photo_back_checked = back_image_base64
                     if backlineflag == True:
@@ -186,7 +195,7 @@ def getuserfeedback(request):
                     queryset[i].save()
 
             # 변수 초기화
-            save_data.clear()
+            # save_data.clear()
 
             if motion_index == "999":
                 serializer = exercise_serializer.MotionSerializer(queryset, many=True)
@@ -194,6 +203,8 @@ def getuserfeedback(request):
                 queryset = queryset[int(motion_index) - 1]
                 serializer = exercise_serializer.MotionSerializer(queryset, many=False)
             return Response(serializer.data)
+    # except ValueError:
+    #     pass
 
 
 # 'apis/images/getjointpoint' - 관절포인트가 담긴 정보를 웹에서 받아오는 함수
@@ -215,7 +226,7 @@ def getjointpoint(request):
     feedback_result.append(feedback.checkCenterofgravity(data))  # 무게중심 깐깐함
     print("피드백 결과 : ", feedback_result)
 
-    save_data.append(data)
+    # save_data.append(data)
 
     # DB에 결과 저장
     print(request.data["exercise_pk"])
