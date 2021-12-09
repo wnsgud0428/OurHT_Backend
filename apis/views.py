@@ -33,6 +33,7 @@ def getRoutes(request):
     ]
     return Response(routes)
 
+
 # 'apis/users/register - 유저 회원가입 기능 처리 함수
 @api_view(["POST"])
 def register(request):
@@ -50,6 +51,7 @@ def register(request):
         else:
             return Response(-1)
 
+
 # 'apis/users/login' - 토큰 통해 유저 로그인 기능 처리 함수
 @api_view(["POST"])
 def login(request):
@@ -59,6 +61,7 @@ def login(request):
         token = Token.objects.get(key=usertoken)
         return Response(token.user.id)
 
+
 # 'apis/users/getuserinfo' - User 정보 반환 API
 @api_view(["POST"])
 def getuserinfo(request):
@@ -67,6 +70,7 @@ def getuserinfo(request):
         user = user_models.User.objects.get(id=userid)
         serializer = user_serializer.UserSerializer(user, many=False)
         return Response(serializer.data)
+
 
 # 'apis/users/updateuserinfo' - User 정보 수정 API
 @api_view(["POST"])
@@ -84,7 +88,8 @@ def updateuserinfo(request):
         user.weight = userweight
         user.save()
         return Response("유저 저장 완료!")
-        
+
+
 # 'apis/users/createexercise' - Exercise 모델 생성, 생성된 모델의 PK를 응답함
 @api_view(["POST"])
 def createexercise(request):
@@ -96,6 +101,7 @@ def createexercise(request):
         )
         return Response(create_exercise.pk)
 
+
 # 'apis/users/getexercise' - Exercise 모델을 웹에 전달해주는 함수
 @api_view(["GET"])
 def getuserexercise(request):
@@ -106,7 +112,7 @@ def getuserexercise(request):
             return Response("User Does Not Exist")
         else:
             queryset = exercise_models.Exercise.objects.filter(user=user.id)
-            #print(queryset.values()[0])  # queryset.values()하면 딕셔너리 형태로 리턴해준다!!!
+            # print(queryset.values()[0])  # queryset.values()하면 딕셔너리 형태로 리턴해준다!!!
 
             # print(queryset2)
 
@@ -120,8 +126,8 @@ def getuserexercise(request):
                 )
                 squat_count = queryset_for_motion.count()
                 serializer.data[i]["squat_count"] = squat_count  # 여기서 값이 수정이 된다?!
-                #print(squat_count)
-            #print(type(serializer.data[0]), serializer.data[0])
+                # print(squat_count)
+            # print(type(serializer.data[0]), serializer.data[0])
 
             # print(serializer.data)
             return Response(serializer.data)
@@ -161,7 +167,7 @@ def getuserfeedback(request):
                     with open("photos/test2.jpg", "rb") as f:
                         encode_str = base64.b64encode(f.read())
 
-                    rmbg = util.NewRemoveBg("J8XPR73KhtfXdm6Djr1CU16h", "error.log")
+                    rmbg = util.NewRemoveBg("m7VxEF39XJX3wQWBRH6XFAKJ", "error.log")
                     rmbg.remove_background_from_base64_img(encode_str)
 
                     image = cv2.imread("photos/no-bg.png", 1)
@@ -203,9 +209,7 @@ def getjointpoint(request):
     image_data = request.data["url"].replace("data:image/webp;base64,", "")
 
     feedback_result.append(feedback.isUpperbodyNotBent(data))
-    feedback_result.append(
-        feedback.isFaceForward(data)
-    )
+    feedback_result.append(feedback.isFaceForward(data))
     feedback_result.append(feedback.checkRangeofmotion(data))
     feedback_result.append(feedback.checkKneeposition(data))
     feedback_result.append(feedback.checkCenterofgravity(data))  # 무게중심 깐깐함
