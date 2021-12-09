@@ -469,9 +469,9 @@ def newCheckBackLine(data, image):  # 파라미터에 있는 image는 remove bg 
     back_image_base64 = im_b64
 
     # 윈도우 창 띄어서 처리된 이미지 보기
-    cv2.imshow("output_image", output_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("output_image", output_image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     if hip_shoulder_slope_diff < 0.5:
         # print("좋은 허리")
