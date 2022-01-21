@@ -3,6 +3,8 @@
 ## 프로젝트 소개
 - ### 프로젝트 명
   - 등 움직임의 분석을 통한 홈 트레이닝 자세 분석 서비스
+  - 교내 캡스톤 경진대회 내 프로젝트 소개 링크
+    - http://www.swaicau.com/bbs/board.php?bo_table=program8&wr_id=71
 
 - ### 팀원
   <table>
