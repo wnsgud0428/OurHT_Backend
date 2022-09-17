@@ -1,10 +1,12 @@
-# 중앙대학교 2021 - 2 캡스톤 디자인 
+# 중앙대학교 2021-2학기 캡스톤디자인
 
 ## 프로젝트 소개
-- ### 프로젝트 명
-  - 등 움직임의 분석을 통한 홈 트레이닝 자세 분석 서비스
-  - 교내 캡스톤 경진대회 내 프로젝트 소개 링크
-    - http://www.swaicau.com/bbs/board.php?bo_table=program8&wr_id=71
+- ### 주제: 홈 트레이닝 자세 분석 서비스
+
+- ### 세부내용
+  - 캠을 이용하여 본인의 운동모습을 촬영하면, 웹 사이트에서 자세에 대한 피드백을 제공
+  - 본인의 운동기록을 캘린더 형식으로 볼 수 있음.
+  - TensorFlow의 PoseNet을 사용해 관절포인트 획득 + Object-Segmentation을 통한 사진배경 제거 + OpenCV 이미지 처리 ⇒ 스쿼트 운동 시 자세 분석.
 
 - ### 팀원
   <table>
@@ -15,19 +17,15 @@
     </tr>
   </table>
 
-- ### Architecture & 특징
+- ### Architecture
   ![image](https://user-images.githubusercontent.com/33740149/150525669-77256be2-648f-4784-a674-3a27ececcbec.png)
-  - TensorFlow PoseNet 딥 러닝 모델과, Remove.bg 배경 제거 API 이용하여 사람의 몸의 움직임 분석하는 알고리즘 구현
-
+<br></br>
 ## 결과물
- - <a href="https://github.com/OurHomeTrainer/OurHT_Backend/blob/main/Documents/OurHomeTraining%20%EC%B5%9C%EC%A2%85%20%EB%A9%94%EB%89%B4%EC%96%BC.pdf"> 프로젝트 사용 메뉴얼 </a>
- - <a href="https://github.com/OurHomeTrainer/OurHT_Backend/blob/main/Documents/%EC%BA%A1%EC%8A%A4%ED%86%A4%20%EC%B5%9C%EC%A2%85%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EB%B3%B4%EA%B3%A0%EC%84%9C.pdf"> 최종 프로젝트 보고서 </a>
 
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/33740149/150533371-9440f53c-77f1-4ae9-9128-79c6a97a9d2b.png">
-  <img src="https://user-images.githubusercontent.com/33740149/150533420-45fffff8-bcdf-4583-906f-9faf58d6bead.png">
-  <img src="https://user-images.githubusercontent.com/33740149/150533464-6457bd68-7041-4a1b-be9b-5776822840b8.png">
-  <img src="https://user-images.githubusercontent.com/33740149/150533497-ab668654-894c-4940-a36b-e6ce8e7ab3ea.png">
-  <img src="https://user-images.githubusercontent.com/33740149/150533544-fda22d64-7890-4040-8901-e71a44264ce8.png">
-  <img src="https://user-images.githubusercontent.com/33740149/153867890-dce33616-f347-4087-8e8c-b1d2dc3f2638.png">
- </p>
+![image](https://user-images.githubusercontent.com/33649857/190857188-e6c08ab6-c659-4bf3-ab75-67877ebc03ac.png)
+
+![image](https://user-images.githubusercontent.com/33649857/190857198-7b336f26-ae40-49e4-8f81-5a747b6907e7.png)
+
+![image](https://user-images.githubusercontent.com/33649857/190857204-0b36ebe1-ff48-47cb-bcaa-847d5cfcf307.png)
+
+![image](https://user-images.githubusercontent.com/33649857/190857209-1e27cb93-cd2c-4c8f-9d3e-32167c3687b0.png)
